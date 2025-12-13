@@ -1083,27 +1083,41 @@
                     </select>
                     
                     <div class="tarot-spread">
-                        <div class="tarot-card" id="card1">
+                        <div class="tarot-card" id="card1" onclick="flipCard(1)">
                             <div class="card-back">🌙</div>
                             <div class="card-front">
                                 <span class="card-image">?</span>
                                 <span class="card-name">翻牌揭曉</span>
                             </div>
                         </div>
-                        <div class="tarot-card" id="card2">
+                        <div class="tarot-card" id="card2" onclick="flipCard(2)">
                             <div class="card-back">⭐</div>
                             <div class="card-front">
                                 <span class="card-image">?</span>
                                 <span class="card-name">翻牌揭曉</span>
                             </div>
                         </div>
-                        <div class="tarot-card" id="card3">
+                        <div class="tarot-card" id="card3" onclick="flipCard(3)">
                             <div class="card-back">☀️</div>
                             <div class="card-front">
                                 <span class="card-image">?</span>
                                 <span class="card-name">翻牌揭曉</span>
                             </div>
                         </div>
+                    </div>
+                    
+                    <p class="flip-hint" id="flipHint" style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; display: none;">👆 點擊卡牌翻牌</p>
+                    
+                    <!-- 翻牌模式選擇 -->
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 16px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; color: var(--text-secondary);">
+                            <input type="radio" name="flipMode" value="auto" checked style="accent-color: var(--accent-purple);"> 
+                            🎬 自動翻牌
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; color: var(--text-secondary);">
+                            <input type="radio" name="flipMode" value="manual" style="accent-color: var(--accent-purple);"> 
+                            👆 手動翻牌
+                        </label>
                     </div>
                     
                     <button class="draw-btn" onclick="drawTarot()">🔮 開始占卜</button>
@@ -1550,40 +1564,113 @@
         // ============================================
         // 塔羅占卜
         // ============================================
+        // 儲存選中的牌
+        let selectedCards = [];
+        let flippedCount = 0;
+        let canFlip = false;
+        
+        function getFlipMode() {
+            const mode = document.querySelector('input[name="flipMode"]:checked');
+            return mode ? mode.value : 'auto';
+        }
+        
         function drawTarot() {
             const btn = document.querySelector('.draw-btn');
+            const flipMode = getFlipMode();
+            
             btn.disabled = true;
-            btn.textContent = '🔮 占卜中...';
+            btn.textContent = '🔮 洗牌中...';
+            
+            // 重置狀態
+            flippedCount = 0;
+            canFlip = false;
+            selectedCards = [];
             
             // 重置卡片
             document.querySelectorAll('.tarot-card').forEach(card => {
                 card.classList.remove('flipped');
+                card.style.pointerEvents = 'none';
             });
             document.getElementById('tarotResult').classList.remove('show');
+            document.getElementById('flipHint').style.display = 'none';
             
             // 隨機選牌
             const shuffled = [...tarotDeck].sort(() => Math.random() - 0.5);
-            const selectedCards = shuffled.slice(0, 3);
+            selectedCards = shuffled.slice(0, 3);
             
-            // 翻牌動畫
-            setTimeout(() => {
-                selectedCards.forEach((card, index) => {
-                    setTimeout(() => {
-                        const cardEl = document.getElementById(`card${index + 1}`);
-                        const front = cardEl.querySelector('.card-front');
-                        front.querySelector('.card-image').textContent = card.icon;
-                        front.querySelector('.card-name').textContent = card.name;
-                        cardEl.classList.add('flipped');
-                    }, index * 500);
-                });
-            }, 500);
+            // 預先設定牌面（但不翻開）
+            selectedCards.forEach((card, index) => {
+                const cardEl = document.getElementById(`card${index + 1}`);
+                const front = cardEl.querySelector('.card-front');
+                front.querySelector('.card-image').textContent = card.icon;
+                front.querySelector('.card-name').textContent = card.name;
+            });
             
-            // 顯示結果
+            // 根據模式處理
             setTimeout(() => {
-                showTarotResult(selectedCards[0]); // 主牌
-                btn.disabled = false;
-                btn.textContent = '🔮 重新占卜';
-            }, 2500);
+                if (flipMode === 'auto') {
+                    // 🎬 自動翻牌模式
+                    btn.textContent = '🔮 翻牌中...';
+                    autoFlipCards();
+                } else {
+                    // 👆 手動翻牌模式
+                    canFlip = true;
+                    document.querySelectorAll('.tarot-card').forEach(card => {
+                        card.style.pointerEvents = 'auto';
+                    });
+                    document.getElementById('flipHint').style.display = 'block';
+                    btn.textContent = '👆 點擊卡牌翻牌';
+                }
+            }, 800);
+        }
+        
+        // 🎬 自動翻牌
+        function autoFlipCards() {
+            selectedCards.forEach((card, index) => {
+                setTimeout(() => {
+                    const cardEl = document.getElementById(`card${index + 1}`);
+                    cardEl.classList.add('flipped');
+                    flippedCount++;
+                    
+                    // 三張都翻完了
+                    if (flippedCount === 3) {
+                        setTimeout(() => {
+                            showTarotResult(selectedCards[0]);
+                            const btn = document.querySelector('.draw-btn');
+                            btn.disabled = false;
+                            btn.textContent = '🔮 重新占卜';
+                        }, 500);
+                    }
+                }, index * 600);
+            });
+        }
+        
+        // 👆 手動翻牌
+        function flipCard(cardNum) {
+            if (!canFlip) return;
+            
+            const cardEl = document.getElementById(`card${cardNum}`);
+            
+            // 已經翻過了
+            if (cardEl.classList.contains('flipped')) return;
+            
+            // 翻牌
+            cardEl.classList.add('flipped');
+            flippedCount++;
+            
+            // 三張都翻完了
+            if (flippedCount === 3) {
+                canFlip = false;
+                document.getElementById('flipHint').style.display = 'none';
+                
+                setTimeout(() => {
+                    showTarotResult(selectedCards[0]);
+                    
+                    const btn = document.querySelector('.draw-btn');
+                    btn.disabled = false;
+                    btn.textContent = '🔮 重新占卜';
+                }, 500);
+            }
         }
         
         function showTarotResult(card) {
