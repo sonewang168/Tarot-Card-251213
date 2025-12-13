@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>🔮 塔羅占卜 & 八字命盤</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #16161f;
+            --bg-tertiary: #1e1e2a;
+            --bg-card: linear-gradient(145deg, #1a1a25, #12121a);
+            --text-primary: #f0e6d3;
+            --text-secondary: #a09080;
+            --text-gold: #d4af37;
+            --accent-purple: #9b59b6;
+            --accent-blue: #3498db;
+            --accent-gold: #f39c12;
+            --accent-red: #e74c3c;
+            --accent-green: #27ae60;
+            --border-color: #2a2a3a;
+            --glow-purple: rgba(155, 89, 182, 0.3);
+            --glow-gold: rgba(212, 175, 55, 0.3);
+            --safe-top: env(safe-area-inset-top, 47px);
+            --safe-bottom: env(safe-area-inset-bottom, 34px);
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(ellipse at top, rgba(155, 89, 182, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        }
+        
+        /* iPhone 容器 */
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            min-height: 100dvh;
+            position: relative;
+        }
+        
+        /* 狀態列 */
+        .status-bar {
+            height: calc(var(--safe-top) + 0px);
+            min-height: 47px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 24px 8px;
+            font-size: 14px;
+            font-weight: 600;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            max-width: 430px;
+            margin: 0 auto;
+            z-index: 100;
+        }
+        
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 20px;
+        }
+        
+        /* 主內容 */
+        .main-content {
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 80px);
+        }
+        
+        /* 標題區 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-icon {
+            font-size: 60px;
+            margin-bottom: 12px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .header h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-gold) 0%, #fff 50%, var(--text-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* 功能選擇 */
+        .feature-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .feature-tab {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-tab.active {
+            background: linear-gradient(145deg, rgba(155, 89, 182, 0.2), rgba(212, 175, 55, 0.1));
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px var(--glow-purple);
+        }
+        
+        .feature-tab-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .feature-tab-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* 內容區塊 */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 塔羅牌區 */
+        .tarot-section {
+            text-align: center;
+        }
+        
+        .tarot-spread {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 24px 0;
+            perspective: 1000px;
+        }
+        
+        .tarot-card {
+            width: 90px;
+            height: 150px;
+            background: linear-gradient(145deg, #2a1f4e, #1a1030);
+            border: 2px solid var(--text-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        
+        .tarot-card:hover {
+            transform: translateY(-10px) rotateY(10deg);
+            box-shadow: 0 15px 40px rgba(155, 89, 182, 0.3);
+        }
+        
+        .tarot-card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .tarot-card .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #2a1f4e, #1a1030);
+        }
+        
+        .tarot-card .card-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f5f0e1, #e8dcc8);
+            color: #2d2d2d;
+            padding: 8px;
+        }
+        
+        .tarot-card .card-front .card-image {
+            font-size: 50px;
+            margin-bottom: 4px;
+        }
+        
+        .tarot-card .card-front .card-name {
+            font-size: 9px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .draw-btn {
+            background: linear-gradient(135deg, var(--accent-purple), #8e44ad);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px var(--glow-purple);
+        }
+        
+        .draw-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .draw-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* 結果卡片 */
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .result-card.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .result-card-image {
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(145deg, #f5f0e1, #e8dcc8);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #2d2d2d;
+            flex-shrink: 0;
+        }
+        
+        .result-card-image .name {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .result-info h3 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 20px;
+            color: var(--text-gold);
+            margin-bottom: 4px;
+        }
+        
+        .result-info .en-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .result-info .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .keyword {
+            background: rgba(155, 89, 182, 0.2);
+            color: var(--accent-purple);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+        
+        .result-content {
+            margin-bottom: 20px;
+        }
+        
+        .result-content h4 {
+            font-size: 14px;
+            color: var(--text-gold);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .result-content p {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+        
+        .fortune-scores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .fortune-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .fortune-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .fortune-item .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .fortune-item .score {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .fortune-item .score.high { color: var(--accent-green); }
+        .fortune-item .score.mid { color: var(--accent-gold); }
+        .fortune-item .score.low { color: var(--accent-red); }
+        
+        /* 八字區 */
+        .bazi-form {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group input,
+        .form-group select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-gold), #e67e22);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        /* 八字結果 */
+        .bazi-result {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            display: none;
+        }
+        
+        .bazi-result.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+        
+        .bazi-pillars {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .bazi-pillar {
+            text-align: center;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 12px 8px;
+        }
+        
+        .pillar-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .pillar-char {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .pillar-char.heaven {
+            color: var(--accent-red);
+        }
+        
+        .pillar-char.earth {
+            color: var(--accent-green);
+        }
+        
+        .pillar-element {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+        
+        .element-analysis {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .element-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .element-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .element-name {
+            width: 40px;
+            font-size: 14px;
+        }
+        
+        .element-bar-bg {
+            flex: 1;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .element-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .element-bar-fill.wood { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .element-bar-fill.fire { background: linear-gradient(90deg, #e74c3c, #ff6b6b); }
+        .element-bar-fill.earth { background: linear-gradient(90deg, #f39c12, #f1c40f); }
+        .element-bar-fill.metal { background: linear-gradient(90deg, #bdc3c7, #ecf0f1); }
+        .element-bar-fill.water { background: linear-gradient(90deg, #3498db, #74b9ff); }
+        
+        .element-count {
+            width: 30px;
+            text-align: right;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* LINE 發送按鈕 */
+        .line-send-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00b900, #00c300);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .line-send-btn:disabled {
+            opacity: 0.5;
+        }
+        
+        /* 設定按鈕 */
+        .settings-btn {
+            position: fixed;
+            top: calc(var(--safe-top) + 10px);
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 101;
+        }
+        
+        /* 設定面板 */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 200;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .settings-panel.active {
+            transform: translateX(0);
+        }
+        
+        .settings-header {
+            padding: calc(var(--safe-top) + 20px) 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .settings-header h2 {
+            font-size: 20px;
+        }
+        
+        .settings-close {
+            background: none;
+            border: none;
+            color: var(--accent-purple);
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .settings-content {
+            padding: 20px;
+        }
+        
+        .settings-section {
+            margin-bottom: 24px;
+        }
+        
+        .settings-section-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .settings-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .settings-item {
+            margin-bottom: 16px;
+        }
+        
+        .settings-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .settings-item label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .settings-item input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .settings-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+        
+        .settings-hint a {
+            color: var(--accent-purple);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: calc(100px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 300;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* 底部導航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 430px;
+            margin: 0 auto;
+            background: rgba(22, 22, 31, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 12px 20px calc(12px + var(--safe-bottom));
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        
+        .nav-item.active {
+            opacity: 1;
+        }
+        
+        .nav-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-item .label {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 狀態列 -->
+        <div class="status-bar">
+            <div class="dynamic-island"></div>
+            <span id="statusTime">9:41</span>
+            <span>🔮</span>
+        </div>
+        
+        <!-- 設定按鈕 -->
+        <button class="settings-btn" onclick="showSettings()">⚙️</button>
+        
+        <!-- 主內容 -->
+        <div class="main-content">
+            <!-- 標題 -->
+            <div class="header">
+                <div class="header-icon">🔮</div>
+                <h1>命理占卜</h1>
+                <p>塔羅占卜 · 八字命盤 · LINE 推送</p>
+            </div>
+            
+            <!-- 功能選擇 -->
+            <div class="feature-tabs">
+                <div class="feature-tab active" onclick="switchTab('tarot')">
+                    <div class="feature-tab-icon">🃏</div>
+                    <div class="feature-tab-title">塔羅占卜</div>
+                </div>
+                <div class="feature-tab" onclick="switchTab('bazi')">
+                    <div class="feature-tab-icon">📅</div>
+                    <div class="feature-tab-title">八字命盤</div>
+                </div>
+            </div>
+            
+            <!-- 塔羅占卜區 -->
+            <div class="content-section active" id="tarot-section">
+                <div class="tarot-section">
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">選擇占卜類型，讓塔羅為你指引方向</p>
+                    
+                    <select id="tarotType" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; color: var(--text-primary); font-size: 15px; margin-bottom: 20px;">
+                        <option value="daily">🌅 每日運勢</option>
+                        <option value="love">💕 愛情運勢</option>
+                        <option value="career">💼 事業運勢</option>
+                        <option value="wealth">💰 財運分析</option>
+                        <option value="yes-no">❓ 是非題占卜</option>
+                    </select>
+                    
+                    <div class="tarot-spread">
+                        <div class="tarot-card" id="card1">
+                            <div class="card-back">🌙</div>
+                            <div class="card-front">
+                                <span class="card-image">?</span>
+                                <span class="card-name">翻牌揭曉</span>
+                            </div>
+                        </div>
+                        <div class="tarot-card" id="card2">
+                            <div class="card-back">⭐</div>
+                            <div class="card-front">
+                                <span class="card-image">?</span>
+                                <span class="card-name">翻牌揭曉</span>
+                            </div>
+                        </div>
+                        <div class="tarot-card" id="card3">
+                            <div class="card-back">☀️</div>
+                            <div class="card-front">
+                                <span class="card-image">?</span>
+                                <span class="card-name">翻牌揭曉</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="draw-btn" onclick="drawTarot()">🔮 開始占卜</button>
+                    
+                    <!-- 塔羅結果 -->
+                    <div class="result-card" id="tarotResult">
+                        <div class="result-header">
+                            <div class="result-card-image" id="resultCardImage">
+                                <span>🃏</span>
+                                <span class="name">牌名</span>
+                            </div>
+                            <div class="result-info">
+                                <h3 id="resultCardName">愚者</h3>
+                                <div class="en-name" id="resultCardEnName">The Fool</div>
+                                <div class="keywords" id="resultKeywords">
+                                    <span class="keyword">新開始</span>
+                                    <span class="keyword">冒險</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="fortune-scores" id="fortuneScores">
+                            <div class="fortune-item">
+                                <div class="icon">⭐</div>
+                                <div class="label">整體運勢</div>
+                                <div class="score high" id="overallScore">85</div>
+                            </div>
+                            <div class="fortune-item">
+                                <div class="icon">💕</div>
+                                <div class="label">愛情運</div>
+                                <div class="score mid" id="loveScore">70</div>
+                            </div>
+                            <div class="fortune-item">
+                                <div class="icon">💼</div>
+                                <div class="label">事業運</div>
+                                <div class="score high" id="careerScore">80</div>
+                            </div>
+                            <div class="fortune-item">
+                                <div class="icon">💰</div>
+                                <div class="label">財運</div>
+                                <div class="score mid" id="wealthScore">65</div>
+                            </div>
+                        </div>
+                        
+                        <div class="result-content">
+                            <h4>📖 牌義解讀</h4>
+                            <p id="resultMeaning">牌義內容...</p>
+                        </div>
+                        
+                        <div class="result-content">
+                            <h4>💡 今日建議</h4>
+                            <p id="resultAdvice">建議內容...</p>
+                        </div>
+                        
+                        <button class="line-send-btn" onclick="sendTarotToLine()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 2C6.48 2 2 5.82 2 10.5c0 2.55 1.25 4.83 3.24 6.36-.12.97-.63 3.61-.73 4.19 0 0-.02.17.09.24.1.06.24.02.24.02.32-.04 3.78-2.47 4.36-2.89.93.14 1.87.21 2.8.21 5.52 0 10-3.82 10-8.5S17.52 2 12 2z"/>
+                            </svg>
+                            發送到 LINE
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 八字命盤區 -->
+            <div class="content-section" id="bazi-section">
+                <div class="bazi-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>出生年</label>
+                            <input type="number" id="birthYear" placeholder="如：1990" min="1900" max="2030">
+                        </div>
+                        <div class="form-group">
+                            <label>出生月</label>
+                            <select id="birthMonth">
+                                <option value="">選擇月份</option>
+                                <option value="1">1月</option>
+                                <option value="2">2月</option>
+                                <option value="3">3月</option>
+                                <option value="4">4月</option>
+                                <option value="5">5月</option>
+                                <option value="6">6月</option>
+                                <option value="7">7月</option>
+                                <option value="8">8月</option>
+                                <option value="9">9月</option>
+                                <option value="10">10月</option>
+                                <option value="11">11月</option>
+                                <option value="12">12月</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>出生日</label>
+                            <input type="number" id="birthDay" placeholder="如：15" min="1" max="31">
+                        </div>
+                        <div class="form-group">
+                            <label>出生時辰</label>
+                            <select id="birthHour">
+                                <option value="">選擇時辰</option>
+                                <option value="0">子時 (23:00-01:00)</option>
+                                <option value="1">丑時 (01:00-03:00)</option>
+                                <option value="2">寅時 (03:00-05:00)</option>
+                                <option value="3">卯時 (05:00-07:00)</option>
+                                <option value="4">辰時 (07:00-09:00)</option>
+                                <option value="5">巳時 (09:00-11:00)</option>
+                                <option value="6">午時 (11:00-13:00)</option>
+                                <option value="7">未時 (13:00-15:00)</option>
+                                <option value="8">申時 (15:00-17:00)</option>
+                                <option value="9">酉時 (17:00-19:00)</option>
+                                <option value="10">戌時 (19:00-21:00)</option>
+                                <option value="11">亥時 (21:00-23:00)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>性別</label>
+                        <select id="gender">
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <button class="analyze-btn" onclick="analyzeBazi()">🔍 分析命盤</button>
+                </div>
+                
+                <!-- 八字結果 -->
+                <div class="bazi-result" id="baziResult">
+                    <h3 style="text-align: center; color: var(--text-gold); margin-bottom: 16px; font-family: 'Noto Serif TC', serif;">📜 八字命盤</h3>
+                    
+                    <div class="bazi-pillars" id="baziPillars">
+                        <div class="bazi-pillar">
+                            <div class="pillar-title">年柱</div>
+                            <div class="pillar-char heaven" id="yearHeaven">甲</div>
+                            <div class="pillar-char earth" id="yearEarth">子</div>
+                            <div class="pillar-element" id="yearElement">木/水</div>
+                        </div>
+                        <div class="bazi-pillar">
+                            <div class="pillar-title">月柱</div>
+                            <div class="pillar-char heaven" id="monthHeaven">乙</div>
+                            <div class="pillar-char earth" id="monthEarth">丑</div>
+                            <div class="pillar-element" id="monthElement">木/土</div>
+                        </div>
+                        <div class="bazi-pillar">
+                            <div class="pillar-title">日柱</div>
+                            <div class="pillar-char heaven" id="dayHeaven">丙</div>
+                            <div class="pillar-char earth" id="dayEarth">寅</div>
+                            <div class="pillar-element" id="dayElement">火/木</div>
+                        </div>
+                        <div class="bazi-pillar">
+                            <div class="pillar-title">時柱</div>
+                            <div class="pillar-char heaven" id="hourHeaven">丁</div>
+                            <div class="pillar-char earth" id="hourEarth">卯</div>
+                            <div class="pillar-element" id="hourElement">火/木</div>
+                        </div>
+                    </div>
+                    
+                    <div class="element-analysis">
+                        <h4 style="margin-bottom: 12px; font-size: 14px;">🔥 五行分析</h4>
+                        <div class="element-bars">
+                            <div class="element-bar">
+                                <span class="element-name">🌳 木</span>
+                                <div class="element-bar-bg">
+                                    <div class="element-bar-fill wood" id="woodBar" style="width: 30%;"></div>
+                                </div>
+                                <span class="element-count" id="woodCount">2</span>
+                            </div>
+                            <div class="element-bar">
+                                <span class="element-name">🔥 火</span>
+                                <div class="element-bar-bg">
+                                    <div class="element-bar-fill fire" id="fireBar" style="width: 20%;"></div>
+                                </div>
+                                <span class="element-count" id="fireCount">1</span>
+                            </div>
+                            <div class="element-bar">
+                                <span class="element-name">⛰️ 土</span>
+                                <div class="element-bar-bg">
+                                    <div class="element-bar-fill earth" id="earthBar" style="width: 25%;"></div>
+                                </div>
+                                <span class="element-count" id="earthCount">2</span>
+                            </div>
+                            <div class="element-bar">
+                                <span class="element-name">🪙 金</span>
+                                <div class="element-bar-bg">
+                                    <div class="element-bar-fill metal" id="metalBar" style="width: 15%;"></div>
+                                </div>
+                                <span class="element-count" id="metalCount">1</span>
+                            </div>
+                            <div class="element-bar">
+                                <span class="element-name">💧 水</span>
+                                <div class="element-bar-bg">
+                                    <div class="element-bar-fill water" id="waterBar" style="width: 10%;"></div>
+                                </div>
+                                <span class="element-count" id="waterCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-content">
+                        <h4>👤 日主分析</h4>
+                        <p id="dayMasterAnalysis">日主分析內容...</p>
+                    </div>
+                    
+                    <div class="result-content">
+                        <h4>💫 命格特點</h4>
+                        <p id="destinyAnalysis">命格分析內容...</p>
+                    </div>
+                    
+                    <div class="result-content">
+                        <h4>🎯 開運建議</h4>
+                        <p id="luckyAdvice">開運建議內容...</p>
+                    </div>
+                    
+                    <button class="line-send-btn" onclick="sendBaziToLine()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 2C6.48 2 2 5.82 2 10.5c0 2.55 1.25 4.83 3.24 6.36-.12.97-.63 3.61-.73 4.19 0 0-.02.17.09.24.1.06.24.02.24.02.32-.04 3.78-2.47 4.36-2.89.93.14 1.87.21 2.8.21 5.52 0 10-3.82 10-8.5S17.52 2 12 2z"/>
+                        </svg>
+                        發送到 LINE
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部導航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('tarot')">
+                <div class="icon">🃏</div>
+                <div class="label">塔羅</div>
+            </div>
+            <div class="nav-item" onclick="switchTab('bazi')">
+                <div class="icon">📅</div>
+                <div class="label">八字</div>
+            </div>
+            <div class="nav-item" onclick="showHistory()">
+                <div class="icon">📜</div>
+                <div class="label">歷史</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 設定面板 -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2>⚙️ 設定</h2>
+            <button class="settings-close" onclick="hideSettings()">完成</button>
+        </div>
+        <div class="settings-content">
+            <div class="settings-section">
+                <div class="settings-section-title">LINE 通知設定</div>
+                <div class="settings-card">
+                    <div class="settings-item">
+                        <label>GAS Web App URL</label>
+                        <input type="text" id="gasUrl" placeholder="https://script.google.com/...">
+                        <div class="settings-hint">部署 GAS 後取得的網址</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================
+        // 塔羅牌資料庫（大阿爾克那 22 張）
+        // ============================================
+        const tarotDeck = [
+            { id: 0, name: '愚者', enName: 'The Fool', icon: '🃏', keywords: ['新開始', '冒險', '純真', '自由'],
+              meaning: '愚者代表著新的開始和無限的可能性。它象徵著勇於冒險、保持純真的心態，以及對未知世界的好奇與探索。',
+              advice: '今天適合嘗試新事物，保持開放的心態。不要被既有的框架限制，相信自己的直覺。' },
+            { id: 1, name: '魔術師', enName: 'The Magician', icon: '🎩', keywords: ['創造力', '意志力', '技能', '行動'],
+              meaning: '魔術師代表著強大的創造力和行動力。你擁有將想法化為現實的能力，所有資源都已齊備。',
+              advice: '現在是展現才能的好時機，善用你的技能和資源，主動出擊會有好結果。' },
+            { id: 2, name: '女祭司', enName: 'The High Priestess', icon: '🌙', keywords: ['直覺', '神秘', '智慧', '潛意識'],
+              meaning: '女祭司代表著深層的直覺和內在智慧。她提醒你傾聽內心的聲音，關注夢境和潛意識的訊息。',
+              advice: '今天不宜匆忙做決定，靜下心來傾聽內心的指引，答案就在你心中。' },
+            { id: 3, name: '女皇', enName: 'The Empress', icon: '👑', keywords: ['豐盛', '母性', '創造', '美麗'],
+              meaning: '女皇代表著豐盛與創造力。她象徵著生命的滋養、物質的富足，以及藝術美感的展現。',
+              advice: '享受生活中的美好事物，關愛身邊的人。創意項目會有好的進展。' },
+            { id: 4, name: '皇帝', enName: 'The Emperor', icon: '🏰', keywords: ['權威', '穩定', '領導', '保護'],
+              meaning: '皇帝代表著權威和穩定的力量。他象徵著理性思維、紀律和建立秩序的能力。',
+              advice: '展現你的領導才能，制定明確的計劃。穩紮穩打會帶來成功。' },
+            { id: 5, name: '教皇', enName: 'The Hierophant', icon: '⛪', keywords: ['傳統', '指導', '信仰', '教育'],
+              meaning: '教皇代表著傳統價值和精神指導。他提醒我們尊重傳統智慧，同時也代表著教育和學習。',
+              advice: '向有經驗的人請教，遵循正確的方法和程序。學習新知識會有收穫。' },
+            { id: 6, name: '戀人', enName: 'The Lovers', icon: '💕', keywords: ['愛情', '選擇', '和諧', '價值觀'],
+              meaning: '戀人牌代表著愛情和重要的選擇。它象徵著內心價值觀的統一，以及與他人建立深層連結。',
+              advice: '傾聽你的心，做出符合價值觀的選擇。感情方面會有重要進展。' },
+            { id: 7, name: '戰車', enName: 'The Chariot', icon: '🏎️', keywords: ['勝利', '意志', '決心', '控制'],
+              meaning: '戰車代表著勝利和前進的動力。它象徵著克服障礙的決心，以及對方向的掌控。',
+              advice: '保持專注和決心，積極採取行動。你正朝著目標穩步前進。' },
+            { id: 8, name: '力量', enName: 'Strength', icon: '🦁', keywords: ['勇氣', '耐心', '內在力量', '慈悲'],
+              meaning: '力量牌代表著內在的勇氣和耐心。真正的力量來自於溫柔和自我控制，而非蠻力。',
+              advice: '以柔克剛，用耐心和愛心面對挑戰。相信自己的內在力量。' },
+            { id: 9, name: '隱士', enName: 'The Hermit', icon: '🏔️', keywords: ['內省', '智慧', '獨處', '尋找'],
+              meaning: '隱士代表著內在的探索和智慧的追尋。他提醒我們有時需要獨處來找到人生的答案。',
+              advice: '給自己一些獨處的時間，反思和沉澱。答案會在靜默中浮現。' },
+            { id: 10, name: '命運之輪', enName: 'Wheel of Fortune', icon: '🎡', keywords: ['轉變', '機會', '命運', '週期'],
+              meaning: '命運之輪代表著生命的循環和轉變。它提醒我們世事無常，好運和挑戰都是暫時的。',
+              advice: '把握當下的機會，順應變化的潮流。好運正在降臨！' },
+            { id: 11, name: '正義', enName: 'Justice', icon: '⚖️', keywords: ['公平', '真相', '因果', '決斷'],
+              meaning: '正義牌代表著公平和真相。它提醒我們每個行為都有後果，要為自己的選擇負責。',
+              advice: '誠實面對自己和他人，做出公正的決定。因果終將顯現。' },
+            { id: 12, name: '倒吊人', enName: 'The Hanged Man', icon: '🙃', keywords: ['犧牲', '等待', '新視角', '放下'],
+              meaning: '倒吊人代表著暫停和換個角度看問題。有時候放手和等待會帶來意想不到的收穫。',
+              advice: '嘗試用不同的角度看待問題，有時候等待也是一種智慧。' },
+            { id: 13, name: '死神', enName: 'Death', icon: '🦋', keywords: ['結束', '轉變', '重生', '放下過去'],
+              meaning: '死神牌代表著結束和轉變。它象徵著舊事物的終結，為新的開始清出空間。',
+              advice: '放下不再需要的事物，擁抱改變。每個結束都是新的開始。' },
+            { id: 14, name: '節制', enName: 'Temperance', icon: '🏺', keywords: ['平衡', '調和', '耐心', '適度'],
+              meaning: '節制代表著平衡和調和。它提醒我們在生活中保持中庸之道，避免極端。',
+              advice: '保持平衡的生活方式，不要操之過急。耐心會帶來好結果。' },
+            { id: 15, name: '惡魔', enName: 'The Devil', icon: '😈', keywords: ['束縛', '誘惑', '慾望', '陰影'],
+              meaning: '惡魔牌代表著內心的束縛和誘惑。它提醒我們正視自己的陰暗面，打破自我設限。',
+              advice: '檢視什麼在束縛你，是時候打破不健康的模式了。' },
+            { id: 16, name: '高塔', enName: 'The Tower', icon: '🗼', keywords: ['突變', '覺醒', '解放', '真相'],
+              meaning: '高塔代表著突然的變化和舊結構的崩塌。雖然令人不安，但它為重建帶來機會。',
+              advice: '準備迎接變化，有些事情需要被打破才能重建得更好。' },
+            { id: 17, name: '星星', enName: 'The Star', icon: '⭐', keywords: ['希望', '靈感', '平靜', '信心'],
+              meaning: '星星代表著希望和靈感。它象徵著困難過後的平靜，以及對美好未來的信心。',
+              advice: '保持希望和信心，美好的事物正在向你靠近。相信宇宙的安排。' },
+            { id: 18, name: '月亮', enName: 'The Moon', icon: '🌕', keywords: ['幻覺', '潛意識', '恐懼', '直覺'],
+              meaning: '月亮代表著潛意識和直覺。它提醒我們關注夢境和內心深處的感受，但也要小心幻覺。',
+              advice: '信任你的直覺，但也要分辨幻覺和現實。等待事情變得清晰。' },
+            { id: 19, name: '太陽', enName: 'The Sun', icon: '☀️', keywords: ['成功', '喜悅', '活力', '光明'],
+              meaning: '太陽是最正面的牌之一，代表著成功、喜悅和充沛的能量。一切都會變得光明。',
+              advice: '充滿自信地前進！今天是充滿能量和正向發展的一天。' },
+            { id: 20, name: '審判', enName: 'Judgement', icon: '📯', keywords: ['覺醒', '更新', '召喚', '反思'],
+              meaning: '審判代表著覺醒和重生的召喚。它提醒我們反思過去，準備迎接新的人生階段。',
+              advice: '傾聽內心的召喚，做出重要的人生決定。更新的時刻到來了。' },
+            { id: 21, name: '世界', enName: 'The World', icon: '🌍', keywords: ['完成', '圓滿', '成就', '整合'],
+              meaning: '世界是大阿爾克那的最後一張牌，代表著一個週期的完成和圓滿。你已經達成了目標。',
+              advice: '慶祝你的成就！一個階段已經圓滿完成，新的旅程即將展開。' }
+        ];
+        
+        // ============================================
+        // 八字資料
+        // ============================================
+        const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        const stemElements = ['木', '木', '火', '火', '土', '土', '金', '金', '水', '水'];
+        const branchElements = ['水', '土', '木', '木', '土', '火', '火', '土', '金', '金', '土', '水'];
+        const branchHours = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        
+        const dayMasterTraits = {
+            '甲': { element: '木', trait: '如大樹般正直向上，有領導力和創造力，但有時過於固執。', lucky: '水、木', color: '綠色、藍色' },
+            '乙': { element: '木', trait: '如花草般柔軟靈活，善於適應環境，有藝術天賦，但有時優柔寡斷。', lucky: '水、木', color: '綠色、藍色' },
+            '丙': { element: '火', trait: '如太陽般熱情開朗，有感染力和行動力，但有時過於衝動。', lucky: '木、火', color: '紅色、橙色' },
+            '丁': { element: '火', trait: '如燭火般溫暖細膩，有洞察力和智慧，但有時過於敏感。', lucky: '木、火', color: '紅色、紫色' },
+            '戊': { element: '土', trait: '如高山般穩重可靠，有責任感和包容心，但有時過於保守。', lucky: '火、土', color: '黃色、棕色' },
+            '己': { element: '土', trait: '如田園般溫和務實，有耐心和細心，但有時過於謹慎。', lucky: '火、土', color: '黃色、米色' },
+            '庚': { element: '金', trait: '如寶劍般果斷堅毅，有決斷力和執行力，但有時過於剛硬。', lucky: '土、金', color: '白色、金色' },
+            '辛': { element: '金', trait: '如珠玉般精緻優雅，有審美力和表達力，但有時過於挑剔。', lucky: '土、金', color: '白色、銀色' },
+            '壬': { element: '水', trait: '如大海般包容智慧，有遠見和創意，但有時過於飄忽。', lucky: '金、水', color: '黑色、藍色' },
+            '癸': { element: '水', trait: '如雨露般滋潤萬物，有直覺力和適應力，但有時過於多慮。', lucky: '金、水', color: '黑色、深藍色' }
+        };
+        
+        // ============================================
+        // 設定
+        // ============================================
+        let settings = {
+            gasUrl: ''
+        };
+        
+        let currentTarotResult = null;
+        let currentBaziResult = null;
+        
+        // ============================================
+        // 初始化
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            updateStatusTime();
+            setInterval(updateStatusTime, 1000);
+        });
+        
+        function updateStatusTime() {
+            const now = new Date();
+            document.getElementById('statusTime').textContent = 
+                `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+        }
+        
+        function loadSettings() {
+            const saved = localStorage.getItem('tarotBaziSettings');
+            if (saved) {
+                settings = JSON.parse(saved);
+                document.getElementById('gasUrl').value = settings.gasUrl || '';
+            }
+        }
+        
+        function saveSettings() {
+            settings.gasUrl = document.getElementById('gasUrl').value.trim();
+            localStorage.setItem('tarotBaziSettings', JSON.stringify(settings));
+        }
+        
+        function showSettings() {
+            document.getElementById('settingsPanel').classList.add('active');
+        }
+        
+        function hideSettings() {
+            saveSettings();
+            document.getElementById('settingsPanel').classList.remove('active');
+            showToast('✅ 設定已儲存');
+        }
+        
+        function switchTab(tab) {
+            // 更新 tab 樣式
+            document.querySelectorAll('.feature-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            
+            if (tab === 'tarot') {
+                document.querySelector('.feature-tab:nth-child(1)').classList.add('active');
+                document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+                document.getElementById('tarot-section').classList.add('active');
+            } else {
+                document.querySelector('.feature-tab:nth-child(2)').classList.add('active');
+                document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+                document.getElementById('bazi-section').classList.add('active');
+            }
+        }
+        
+        function showHistory() {
+            showToast('📜 歷史紀錄功能開發中...');
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // ============================================
+        // 塔羅占卜
+        // ============================================
+        function drawTarot() {
+            const btn = document.querySelector('.draw-btn');
+            btn.disabled = true;
+            btn.textContent = '🔮 占卜中...';
+            
+            // 重置卡片
+            document.querySelectorAll('.tarot-card').forEach(card => {
+                card.classList.remove('flipped');
+            });
+            document.getElementById('tarotResult').classList.remove('show');
+            
+            // 隨機選牌
+            const shuffled = [...tarotDeck].sort(() => Math.random() - 0.5);
+            const selectedCards = shuffled.slice(0, 3);
+            
+            // 翻牌動畫
+            setTimeout(() => {
+                selectedCards.forEach((card, index) => {
+                    setTimeout(() => {
+                        const cardEl = document.getElementById(`card${index + 1}`);
+                        const front = cardEl.querySelector('.card-front');
+                        front.querySelector('.card-image').textContent = card.icon;
+                        front.querySelector('.card-name').textContent = card.name;
+                        cardEl.classList.add('flipped');
+                    }, index * 500);
+                });
+            }, 500);
+            
+            // 顯示結果
+            setTimeout(() => {
+                showTarotResult(selectedCards[0]); // 主牌
+                btn.disabled = false;
+                btn.textContent = '🔮 重新占卜';
+            }, 2500);
+        }
+        
+        function showTarotResult(card) {
+            // 隨機運勢分數
+            const overall = Math.floor(Math.random() * 30) + 70;
+            const love = Math.floor(Math.random() * 40) + 50;
+            const career = Math.floor(Math.random() * 40) + 55;
+            const wealth = Math.floor(Math.random() * 40) + 45;
+            
+            // 更新 UI
+            document.getElementById('resultCardImage').innerHTML = `
+                <span>${card.icon}</span>
+                <span class="name">${card.name}</span>
+            `;
+            document.getElementById('resultCardName').textContent = card.name;
+            document.getElementById('resultCardEnName').textContent = card.enName;
+            document.getElementById('resultKeywords').innerHTML = 
+                card.keywords.map(k => `<span class="keyword">${k}</span>`).join('');
+            
+            document.getElementById('overallScore').textContent = overall;
+            document.getElementById('overallScore').className = `score ${overall >= 75 ? 'high' : overall >= 50 ? 'mid' : 'low'}`;
+            
+            document.getElementById('loveScore').textContent = love;
+            document.getElementById('loveScore').className = `score ${love >= 75 ? 'high' : love >= 50 ? 'mid' : 'low'}`;
+            
+            document.getElementById('careerScore').textContent = career;
+            document.getElementById('careerScore').className = `score ${career >= 75 ? 'high' : career >= 50 ? 'mid' : 'low'}`;
+            
+            document.getElementById('wealthScore').textContent = wealth;
+            document.getElementById('wealthScore').className = `score ${wealth >= 75 ? 'high' : wealth >= 50 ? 'mid' : 'low'}`;
+            
+            document.getElementById('resultMeaning').textContent = card.meaning;
+            document.getElementById('resultAdvice').textContent = card.advice;
+            
+            document.getElementById('tarotResult').classList.add('show');
+            
+            // 儲存結果
+            currentTarotResult = {
+                card: card,
+                scores: { overall, love, career, wealth },
+                date: new Date().toLocaleDateString('zh-TW')
+            };
+        }
+        
+        // ============================================
+        // 八字命盤
+        // ============================================
+        function analyzeBazi() {
+            const year = parseInt(document.getElementById('birthYear').value);
+            const month = parseInt(document.getElementById('birthMonth').value);
+            const day = parseInt(document.getElementById('birthDay').value);
+            const hour = parseInt(document.getElementById('birthHour').value);
+            const gender = document.getElementById('gender').value;
+            
+            if (!year || !month || !day || isNaN(hour)) {
+                showToast('⚠️ 請填寫完整的出生資訊');
+                return;
+            }
+            
+            // 計算八字（簡化算法）
+            const bazi = calculateBazi(year, month, day, hour);
+            
+            // 顯示結果
+            displayBaziResult(bazi, gender);
+        }
+        
+        function calculateBazi(year, month, day, hour) {
+            // 年柱（簡化：用年份直接計算）
+            const yearStemIdx = (year - 4) % 10;
+            const yearBranchIdx = (year - 4) % 12;
+            
+            // 月柱（簡化算法）
+            const monthStemIdx = (yearStemIdx * 2 + month) % 10;
+            const monthBranchIdx = (month + 1) % 12;
+            
+            // 日柱（簡化：使用偽隨機但固定的算法）
+            const daySeed = year * 365 + month * 30 + day;
+            const dayStemIdx = daySeed % 10;
+            const dayBranchIdx = daySeed % 12;
+            
+            // 時柱
+            const hourStemIdx = (dayStemIdx * 2 + hour) % 10;
+            const hourBranchIdx = hour;
+            
+            return {
+                year: { stem: heavenlyStems[yearStemIdx], branch: earthlyBranches[yearBranchIdx], 
+                        stemElement: stemElements[yearStemIdx], branchElement: branchElements[yearBranchIdx] },
+                month: { stem: heavenlyStems[monthStemIdx], branch: earthlyBranches[monthBranchIdx],
+                         stemElement: stemElements[monthStemIdx], branchElement: branchElements[monthBranchIdx] },
+                day: { stem: heavenlyStems[dayStemIdx], branch: earthlyBranches[dayBranchIdx],
+                       stemElement: stemElements[dayStemIdx], branchElement: branchElements[dayBranchIdx] },
+                hour: { stem: heavenlyStems[hourStemIdx], branch: earthlyBranches[hourBranchIdx],
+                        stemElement: stemElements[hourStemIdx], branchElement: branchElements[hourBranchIdx] }
+            };
+        }
+        
+        function displayBaziResult(bazi, gender) {
+            // 更新四柱
+            document.getElementById('yearHeaven').textContent = bazi.year.stem;
+            document.getElementById('yearEarth').textContent = bazi.year.branch;
+            document.getElementById('yearElement').textContent = `${bazi.year.stemElement}/${bazi.year.branchElement}`;
+            
+            document.getElementById('monthHeaven').textContent = bazi.month.stem;
+            document.getElementById('monthEarth').textContent = bazi.month.branch;
+            document.getElementById('monthElement').textContent = `${bazi.month.stemElement}/${bazi.month.branchElement}`;
+            
+            document.getElementById('dayHeaven').textContent = bazi.day.stem;
+            document.getElementById('dayEarth').textContent = bazi.day.branch;
+            document.getElementById('dayElement').textContent = `${bazi.day.stemElement}/${bazi.day.branchElement}`;
+            
+            document.getElementById('hourHeaven').textContent = bazi.hour.stem;
+            document.getElementById('hourEarth').textContent = bazi.hour.branch;
+            document.getElementById('hourElement').textContent = `${bazi.hour.stemElement}/${bazi.hour.branchElement}`;
+            
+            // 計算五行統計
+            const elements = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+            [bazi.year, bazi.month, bazi.day, bazi.hour].forEach(pillar => {
+                elements[pillar.stemElement]++;
+                elements[pillar.branchElement]++;
+            });
+            
+            const total = Object.values(elements).reduce((a, b) => a + b, 0);
+            
+            // 更新五行圖表
+            document.getElementById('woodBar').style.width = `${(elements['木'] / total) * 100}%`;
+            document.getElementById('woodCount').textContent = elements['木'];
+            
+            document.getElementById('fireBar').style.width = `${(elements['火'] / total) * 100}%`;
+            document.getElementById('fireCount').textContent = elements['火'];
+            
+            document.getElementById('earthBar').style.width = `${(elements['土'] / total) * 100}%`;
+            document.getElementById('earthCount').textContent = elements['土'];
+            
+            document.getElementById('metalBar').style.width = `${(elements['金'] / total) * 100}%`;
+            document.getElementById('metalCount').textContent = elements['金'];
+            
+            document.getElementById('waterBar').style.width = `${(elements['水'] / total) * 100}%`;
+            document.getElementById('waterCount').textContent = elements['水'];
+            
+            // 日主分析
+            const dayMaster = bazi.day.stem;
+            const traits = dayMasterTraits[dayMaster];
+            
+            document.getElementById('dayMasterAnalysis').textContent = 
+                `您的日主為「${dayMaster}」，屬${traits.element}。${traits.trait}`;
+            
+            // 命格分析（簡化）
+            const missingElements = Object.entries(elements)
+                .filter(([_, count]) => count === 0)
+                .map(([element]) => element);
+            
+            let destinyText = `八字五行中，`;
+            if (missingElements.length > 0) {
+                destinyText += `缺少${missingElements.join('、')}，建議在生活中多補充相關元素。`;
+            } else {
+                destinyText += `五行俱全，命格較為平衡。`;
+            }
+            
+            const maxElement = Object.entries(elements).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+            destinyText += `命中${maxElement}旺，${getElementTrait(maxElement)}`;
+            
+            document.getElementById('destinyAnalysis').textContent = destinyText;
+            
+            // 開運建議
+            document.getElementById('luckyAdvice').textContent = 
+                `開運顏色：${traits.color}。有利五行：${traits.lucky}。建議多往有利方位發展，佩戴相應顏色的飾品可增強運勢。`;
+            
+            document.getElementById('baziResult').classList.add('show');
+            
+            // 儲存結果
+            currentBaziResult = {
+                bazi: bazi,
+                elements: elements,
+                dayMaster: dayMaster,
+                traits: traits,
+                gender: gender
+            };
+        }
+        
+        function getElementTrait(element) {
+            const traits = {
+                '木': '代表仁慈、成長、創新的特質較為突出。',
+                '火': '代表熱情、禮儀、行動的特質較為突出。',
+                '土': '代表誠信、穩重、包容的特質較為突出。',
+                '金': '代表義氣、果斷、堅毅的特質較為突出。',
+                '水': '代表智慧、靈活、適應的特質較為突出。'
+            };
+            return traits[element];
+        }
+        
+        // ============================================
+        // LINE 發送
+        // ============================================
+        async function sendTarotToLine() {
+            if (!settings.gasUrl) {
+                showToast('⚠️ 請先設定 GAS URL');
+                showSettings();
+                return;
+            }
+            
+            if (!currentTarotResult) {
+                showToast('⚠️ 請先進行占卜');
+                return;
+            }
+            
+            const btn = document.querySelector('#tarot-section .line-send-btn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 發送中...';
+            
+            try {
+                const data = {
+                    action: 'sendTarot',
+                    result: currentTarotResult
+                };
+                
+                await fetch(settings.gasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                showToast('✅ 已發送到 LINE！');
+            } catch (error) {
+                showToast('❌ 發送失敗');
+                console.error(error);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 2C6.48 2 2 5.82 2 10.5c0 2.55 1.25 4.83 3.24 6.36-.12.97-.63 3.61-.73 4.19 0 0-.02.17.09.24.1.06.24.02.24.02.32-.04 3.78-2.47 4.36-2.89.93.14 1.87.21 2.8.21 5.52 0 10-3.82 10-8.5S17.52 2 12 2z"/>
+                </svg>
+                發送到 LINE
+            `;
+        }
+        
+        async function sendBaziToLine() {
+            if (!settings.gasUrl) {
+                showToast('⚠️ 請先設定 GAS URL');
+                showSettings();
+                return;
+            }
+            
+            if (!currentBaziResult) {
+                showToast('⚠️ 請先分析命盤');
+                return;
+            }
+            
+            const btn = document.querySelector('#bazi-section .line-send-btn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 發送中...';
+            
+            try {
+                const data = {
+                    action: 'sendBazi',
+                    result: currentBaziResult
+                };
+                
+                await fetch(settings.gasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                showToast('✅ 已發送到 LINE！');
+            } catch (error) {
+                showToast('❌ 發送失敗');
+                console.error(error);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 2C6.48 2 2 5.82 2 10.5c0 2.55 1.25 4.83 3.24 6.36-.12.97-.63 3.61-.73 4.19 0 0-.02.17.09.24.1.06.24.02.24.02.32-.04 3.78-2.47 4.36-2.89.93.14 1.87.21 2.8.21 5.52 0 10-3.82 10-8.5S17.52 2 12 2z"/>
+                </svg>
+                發送到 LINE
+            `;
+        }
+    </script>
+</body>
+</html>
