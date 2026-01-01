@@ -9,2580 +9,380 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #16161f;
-            --bg-tertiary: #1e1e2a;
+            --bg-primary: #0a0a0f; --bg-secondary: #16161f; --bg-tertiary: #1e1e2a;
             --bg-card: linear-gradient(145deg, #1a1a25, #12121a);
-            --text-primary: #f0e6d3;
-            --text-secondary: #a09080;
-            --text-gold: #d4af37;
-            --accent-purple: #9b59b6;
-            --accent-blue: #3498db;
-            --accent-gold: #f39c12;
-            --accent-red: #e74c3c;
-            --accent-green: #27ae60;
-            --accent-pink: #e91e63;
-            --border-color: #2a2a3a;
-            --glow-purple: rgba(155, 89, 182, 0.3);
-            --glow-gold: rgba(212, 175, 55, 0.3);
-            --safe-top: env(safe-area-inset-top, 47px);
-            --safe-bottom: env(safe-area-inset-bottom, 34px);
-            --neon-cyan: #00f5ff;
-            --neon-purple: #bf00ff;
-            --neon-blue: #0080ff;
-        }
-        
-        /* ============================================
-           🌀 冷光科技開機動畫
-           ============================================ */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        
-        .splash-screen.fade-out {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .splash-container {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .splash-text {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 100px;
-            font-weight: 700;
-            color: transparent;
-            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 50%, var(--neon-cyan) 100%);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: textGlow 2s ease-in-out infinite, textShine 3s linear infinite;
-            filter: drop-shadow(0 0 20px var(--neon-cyan)) drop-shadow(0 0 40px var(--neon-purple));
-            z-index: 10;
-        }
-        
-        @keyframes textGlow {
-            0%, 100% { filter: drop-shadow(0 0 20px var(--neon-cyan)) drop-shadow(0 0 40px var(--neon-purple)); }
-            50% { filter: drop-shadow(0 0 40px var(--neon-cyan)) drop-shadow(0 0 60px var(--neon-purple)) drop-shadow(0 0 80px var(--neon-blue)); }
-        }
-        
-        @keyframes textShine {
-            0% { background-position: 200% center; }
-            100% { background-position: -200% center; }
-        }
-        
-        .ring-1 {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 3px solid transparent;
-            border-top-color: var(--neon-cyan);
-            border-right-color: var(--neon-cyan);
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-            box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 20px rgba(0, 245, 255, 0.1);
-        }
-        
-        .ring-2 {
-            position: absolute;
-            width: 85%;
-            height: 85%;
-            border: 2px solid transparent;
-            border-bottom-color: var(--neon-purple);
-            border-left-color: var(--neon-purple);
-            border-radius: 50%;
-            animation: spin-reverse 1.5s linear infinite;
-            box-shadow: 0 0 15px var(--neon-purple), inset 0 0 15px rgba(191, 0, 255, 0.1);
-        }
-        
-        .ring-3 {
-            position: absolute;
-            width: 70%;
-            height: 70%;
-            border: 2px dashed var(--neon-blue);
-            border-radius: 50%;
-            animation: spin 3s linear infinite;
-            opacity: 0.6;
-        }
-        
-        .bagua-ring {
-            position: absolute;
-            width: 110%;
-            height: 110%;
-            animation: spin-reverse 10s linear infinite;
-        }
-        
-        .bagua-symbol {
-            position: absolute;
-            font-size: 20px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            animation: symbolPulse 2s ease-in-out infinite;
-        }
-        
-        .bagua-symbol:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
-        .bagua-symbol:nth-child(2) { top: 15%; right: 15%; animation-delay: 0.25s; }
-        .bagua-symbol:nth-child(3) { top: 50%; right: 0; transform: translateY(-50%); animation-delay: 0.5s; }
-        .bagua-symbol:nth-child(4) { bottom: 15%; right: 15%; animation-delay: 0.75s; }
-        .bagua-symbol:nth-child(5) { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 1s; }
-        .bagua-symbol:nth-child(6) { bottom: 15%; left: 15%; animation-delay: 1.25s; }
-        .bagua-symbol:nth-child(7) { top: 50%; left: 0; transform: translateY(-50%); animation-delay: 1.5s; }
-        .bagua-symbol:nth-child(8) { top: 15%; left: 15%; animation-delay: 1.75s; }
-        
-        @keyframes symbolPulse {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes spin-reverse {
-            0% { transform: rotate(360deg); }
-            100% { transform: rotate(0deg); }
-        }
-        
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            animation: particleFloat 3s ease-in-out infinite;
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-        
-        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
-        .particle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
-        .particle:nth-child(3) { left: 30%; animation-delay: 1s; }
-        .particle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
-        .particle:nth-child(5) { left: 50%; animation-delay: 0.3s; }
-        .particle:nth-child(6) { left: 60%; animation-delay: 0.8s; }
-        .particle:nth-child(7) { left: 70%; animation-delay: 1.3s; }
-        .particle:nth-child(8) { left: 80%; animation-delay: 0.6s; }
-        .particle:nth-child(9) { left: 90%; animation-delay: 1.1s; }
-        
-        @keyframes particleFloat {
-            0% { bottom: -10px; opacity: 0; }
-            20% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { bottom: 100%; opacity: 0; }
-        }
-        
-        .splash-loading {
-            margin-top: 60px;
-            text-align: center;
-        }
-        
-        .splash-title {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 24px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 20px var(--neon-cyan);
-            margin-bottom: 16px;
-            animation: titlePulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes titlePulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-        
-        .splash-subtitle {
-            font-size: 14px;
-            color: #666;
-            letter-spacing: 4px;
-        }
-        
-        .progress-bar {
-            width: 200px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 24px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-cyan));
-            background-size: 200% 100%;
-            border-radius: 2px;
-            animation: progressAnim 2s ease-in-out forwards, progressShine 1s linear infinite;
-        }
-        
-        @keyframes progressAnim {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-        
-        @keyframes progressShine {
-            0% { background-position: 200% center; }
-            100% { background-position: -200% center; }
-        }
-        
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(ellipse at top, rgba(155, 89, 182, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
-        }
-        
-        .app-container {
-            max-width: 430px;
-            margin: 0 auto;
-            min-height: 100vh;
-            min-height: 100dvh;
-            position: relative;
-        }
-        
-        /* 狀態列 */
-        .status-bar {
-            height: calc(var(--safe-top) + 0px);
-            min-height: 47px;
-            background: transparent;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding: 0 24px 8px;
-            font-size: 14px;
-            font-weight: 600;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            max-width: 430px;
-            margin: 0 auto;
-            z-index: 100;
-        }
-        
-        .dynamic-island {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 126px;
-            height: 37px;
-            background: #000;
-            border-radius: 20px;
-        }
-        
-        /* 頂部工具列 */
-        .top-toolbar {
-            position: fixed;
-            top: calc(var(--safe-top) + 10px);
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 101;
-        }
-        
-        .toolbar-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .toolbar-btn:active {
-            transform: scale(0.9);
-        }
-        
-        /* 主內容 */
-        .main-content {
-            padding: calc(var(--safe-top) + 20px) 16px calc(var(--safe-bottom) + 80px);
-        }
-        
-        /* 標題區 */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .header-icon {
-            font-size: 50px;
-            margin-bottom: 8px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        
-        .header h1 {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 26px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--text-gold) 0%, #fff 50%, var(--text-gold) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 6px;
-        }
-        
-        .header p {
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-        
-        /* 牌陣選擇 */
-        .spread-selector {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 0 16px;
-            margin-bottom: 16px;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .spread-selector::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .spread-btn {
-            flex-shrink: 0;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 10px 16px;
-            color: var(--text-secondary);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .spread-btn.active {
-            background: linear-gradient(135deg, var(--accent-purple), #8e44ad);
-            border-color: var(--accent-purple);
-            color: white;
-            box-shadow: 0 0 15px var(--glow-purple);
-        }
-        
-        /* 問題輸入 */
-        .question-input {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-        }
-        
-        .question-input input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 15px;
-            outline: none;
-        }
-        
-        .question-input input::placeholder {
-            color: var(--text-secondary);
-        }
-        
-        /* 塔羅牌區 */
-        .tarot-area {
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .tarot-spread {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 16px 0;
-            perspective: 1000px;
-        }
-        
-        .tarot-card {
-            width: 70px;
-            height: 110px;
-            background: linear-gradient(145deg, #2a1f4e, #1a1030);
-            border: 2px solid var(--text-gold);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            cursor: pointer;
-            transition: all 0.5s ease;
-            transform-style: preserve-3d;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        
-        .tarot-card.large {
-            width: 90px;
-            height: 140px;
-            font-size: 36px;
-        }
-        
-        .tarot-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(155, 89, 182, 0.3);
-        }
-        
-        .tarot-card:active {
-            transform: scale(0.95);
-        }
-        
-        .tarot-card.flipped {
-            transform: rotateY(180deg);
-        }
-        
-        .tarot-card.reversed .card-front {
-            transform: rotateY(180deg) rotateZ(180deg);
-        }
-        
-        .tarot-card .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: linear-gradient(145deg, #2a1f4e, #1a1030);
-        }
-        
-        .tarot-card .card-front {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            transform: rotateY(180deg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: linear-gradient(145deg, #f5f0e1, #e8dcc8);
-            color: #2d2d2d;
-            padding: 6px;
-        }
-        
-        .tarot-card .card-front .card-image {
-            font-size: inherit;
-            margin-bottom: 2px;
-        }
-        
-        .tarot-card .card-front .card-name {
-            font-size: 8px;
-            font-weight: 600;
-            text-align: center;
-            line-height: 1.1;
-        }
-        
-        .tarot-card .card-front .reversed-mark {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            font-size: 10px;
-            color: var(--accent-red);
-        }
-        
-        .card-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            text-align: center;
-        }
-        
-        /* 控制按鈕 */
-        .control-area {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .flip-mode-toggle {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 12px;
-        }
-        
-        .flip-mode-toggle label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        .flip-mode-toggle input {
-            accent-color: var(--accent-purple);
-        }
-        
-        .draw-btn {
-            background: linear-gradient(135deg, var(--accent-purple), #8e44ad);
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--glow-purple);
-        }
-        
-        .draw-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .draw-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .flip-hint {
-            color: var(--text-secondary);
-            font-size: 13px;
-            margin-top: 12px;
-            display: none;
-        }
-        
-        /* 結果區 */
-        .result-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .result-section.show {
-            display: block;
-            animation: slideUp 0.5s ease;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .result-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 16px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .result-card-preview {
-            width: 60px;
-            height: 90px;
-            background: linear-gradient(145deg, #f5f0e1, #e8dcc8);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: #2d2d2d;
-            flex-shrink: 0;
-        }
-        
-        .result-card-preview .name {
-            font-size: 9px;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        
-        .result-info h3 {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 18px;
-            color: var(--text-gold);
-            margin-bottom: 4px;
-        }
-        
-        .result-info .position {
-            font-size: 12px;
-            color: var(--accent-purple);
-            margin-bottom: 6px;
-        }
-        
-        .result-info .keywords {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        
-        .keyword {
-            background: rgba(155, 89, 182, 0.2);
-            color: var(--accent-purple);
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-        }
-        
-        .keyword.reversed {
-            background: rgba(231, 76, 60, 0.2);
-            color: var(--accent-red);
-        }
-        
-        /* 運勢分數 */
-        .fortune-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 16px 0;
-        }
-        
-        .fortune-item {
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            padding: 10px 6px;
-            text-align: center;
-        }
-        
-        .fortune-item .icon {
-            font-size: 20px;
-            margin-bottom: 3px;
-        }
-        
-        .fortune-item .label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            margin-bottom: 2px;
-        }
-        
-        .fortune-item .score {
-            font-size: 16px;
-            font-weight: 700;
-        }
-        
+            --text-primary: #f0e6d3; --text-secondary: #a09080; --text-gold: #d4af37;
+            --accent-purple: #9b59b6; --accent-blue: #3498db; --accent-gold: #f39c12;
+            --accent-red: #e74c3c; --accent-green: #27ae60; --accent-pink: #e91e63;
+            --border-color: #2a2a3a; --glow-purple: rgba(155, 89, 182, 0.3); --glow-gold: rgba(212, 175, 55, 0.3);
+            --safe-top: env(safe-area-inset-top, 47px); --safe-bottom: env(safe-area-inset-bottom, 34px);
+            --neon-cyan: #00f5ff; --neon-purple: #bf00ff; --neon-blue: #0080ff;
+        }
+        
+        .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.8s ease, visibility 0.8s ease; }
+        .splash-screen.fade-out { opacity: 0; visibility: hidden; }
+        .splash-container { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; }
+        .splash-text { font-family: 'Noto Serif TC', serif; font-size: 100px; font-weight: 700; color: transparent; background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 50%, var(--neon-cyan) 100%); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; animation: textGlow 2s ease-in-out infinite, textShine 3s linear infinite; filter: drop-shadow(0 0 20px var(--neon-cyan)) drop-shadow(0 0 40px var(--neon-purple)); z-index: 10; }
+        @keyframes textGlow { 0%, 100% { filter: drop-shadow(0 0 20px var(--neon-cyan)) drop-shadow(0 0 40px var(--neon-purple)); } 50% { filter: drop-shadow(0 0 40px var(--neon-cyan)) drop-shadow(0 0 60px var(--neon-purple)) drop-shadow(0 0 80px var(--neon-blue)); } }
+        @keyframes textShine { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+        .ring-1 { position: absolute; width: 100%; height: 100%; border: 3px solid transparent; border-top-color: var(--neon-cyan); border-right-color: var(--neon-cyan); border-radius: 50%; animation: spin 2s linear infinite; box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 20px rgba(0, 245, 255, 0.1); }
+        .ring-2 { position: absolute; width: 85%; height: 85%; border: 2px solid transparent; border-bottom-color: var(--neon-purple); border-left-color: var(--neon-purple); border-radius: 50%; animation: spin-reverse 1.5s linear infinite; box-shadow: 0 0 15px var(--neon-purple), inset 0 0 15px rgba(191, 0, 255, 0.1); }
+        .ring-3 { position: absolute; width: 70%; height: 70%; border: 2px dashed var(--neon-blue); border-radius: 50%; animation: spin 3s linear infinite; opacity: 0.6; }
+        .bagua-ring { position: absolute; width: 110%; height: 110%; animation: spin-reverse 10s linear infinite; }
+        .bagua-symbol { position: absolute; font-size: 20px; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); animation: symbolPulse 2s ease-in-out infinite; }
+        .bagua-symbol:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); } .bagua-symbol:nth-child(2) { top: 15%; right: 15%; animation-delay: 0.25s; } .bagua-symbol:nth-child(3) { top: 50%; right: 0; transform: translateY(-50%); animation-delay: 0.5s; } .bagua-symbol:nth-child(4) { bottom: 15%; right: 15%; animation-delay: 0.75s; } .bagua-symbol:nth-child(5) { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 1s; } .bagua-symbol:nth-child(6) { bottom: 15%; left: 15%; animation-delay: 1.25s; } .bagua-symbol:nth-child(7) { top: 50%; left: 0; transform: translateY(-50%); animation-delay: 1.5s; } .bagua-symbol:nth-child(8) { top: 15%; left: 15%; animation-delay: 1.75s; }
+        @keyframes symbolPulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        .particles { position: absolute; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+        .particle { position: absolute; width: 4px; height: 4px; background: var(--neon-cyan); border-radius: 50%; animation: particleFloat 3s ease-in-out infinite; box-shadow: 0 0 10px var(--neon-cyan); }
+        .particle:nth-child(1) { left: 10%; } .particle:nth-child(2) { left: 20%; animation-delay: 0.5s; } .particle:nth-child(3) { left: 30%; animation-delay: 1s; } .particle:nth-child(4) { left: 40%; animation-delay: 1.5s; } .particle:nth-child(5) { left: 50%; animation-delay: 0.3s; } .particle:nth-child(6) { left: 60%; animation-delay: 0.8s; } .particle:nth-child(7) { left: 70%; animation-delay: 1.3s; } .particle:nth-child(8) { left: 80%; animation-delay: 0.6s; } .particle:nth-child(9) { left: 90%; animation-delay: 1.1s; }
+        @keyframes particleFloat { 0% { bottom: -10px; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { bottom: 100%; opacity: 0; } }
+        .splash-loading { margin-top: 60px; text-align: center; }
+        .splash-title { font-family: 'Noto Serif TC', serif; font-size: 24px; color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan); margin-bottom: 16px; animation: titlePulse 2s ease-in-out infinite; }
+        @keyframes titlePulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+        .splash-subtitle { font-size: 14px; color: #666; letter-spacing: 4px; }
+        .progress-bar { width: 200px; height: 3px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin-top: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-cyan)); background-size: 200% 100%; border-radius: 2px; animation: progressAnim 2s ease-in-out forwards, progressShine 1s linear infinite; }
+        @keyframes progressAnim { 0% { width: 0%; } 100% { width: 100%; } }
+        @keyframes progressShine { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+
+        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; min-height: 100dvh; overflow-x: hidden; background-image: radial-gradient(ellipse at top, rgba(155, 89, 182, 0.1) 0%, transparent 50%), radial-gradient(ellipse at bottom, rgba(212, 175, 55, 0.05) 0%, transparent 50%); }
+        .app-container { max-width: 430px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; position: relative; }
+        .status-bar { height: calc(var(--safe-top) + 0px); min-height: 47px; background: transparent; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 24px 8px; font-size: 14px; font-weight: 600; position: fixed; top: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; z-index: 100; }
+        .dynamic-island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 126px; height: 37px; background: #000; border-radius: 20px; }
+        .top-toolbar { position: fixed; top: calc(var(--safe-top) + 10px); right: 20px; display: flex; gap: 10px; z-index: 101; }
+        .toolbar-btn { background: rgba(255,255,255,0.1); border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; transition: all 0.2s; }
+        .toolbar-btn:active { transform: scale(0.9); }
+        .main-content { padding: calc(var(--safe-top) + 20px) 16px calc(var(--safe-bottom) + 80px); }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header-icon { font-size: 50px; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .header h1 { font-family: 'Noto Serif TC', serif; font-size: 26px; font-weight: 700; background: linear-gradient(135deg, var(--text-gold) 0%, #fff 50%, var(--text-gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
+        .header p { color: var(--text-secondary); font-size: 13px; }
+        .spread-selector { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 16px; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
+        .spread-selector::-webkit-scrollbar { display: none; }
+        .spread-btn { flex-shrink: 0; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; padding: 10px 16px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .spread-btn.active { background: linear-gradient(135deg, var(--accent-purple), #8e44ad); border-color: var(--accent-purple); color: white; box-shadow: 0 0 15px var(--glow-purple); }
+        .question-input { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; }
+        .question-input input { width: 100%; background: transparent; border: none; color: var(--text-primary); font-size: 15px; outline: none; }
+        .question-input input::placeholder { color: var(--text-secondary); }
+        .tarot-area { min-height: 200px; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        .tarot-spread { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 16px 0; perspective: 1000px; }
+        .tarot-card { width: 70px; height: 110px; background: linear-gradient(145deg, #2a1f4e, #1a1030); border: 2px solid var(--text-gold); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: all 0.5s ease; transform-style: preserve-3d; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .tarot-card.large { width: 90px; height: 140px; font-size: 36px; }
+        .tarot-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(155, 89, 182, 0.3); }
+        .tarot-card:active { transform: scale(0.95); }
+        .tarot-card.flipped { transform: rotateY(180deg); }
+        .tarot-card.reversed .card-front { transform: rotateY(180deg) rotateZ(180deg); }
+        .tarot-card .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; background: linear-gradient(145deg, #2a1f4e, #1a1030); }
+        .tarot-card .card-front { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; background: linear-gradient(145deg, #f5f0e1, #e8dcc8); color: #2d2d2d; padding: 6px; }
+        .tarot-card .card-front .card-image { font-size: inherit; margin-bottom: 2px; }
+        .tarot-card .card-front .card-name { font-size: 8px; font-weight: 600; text-align: center; line-height: 1.1; }
+        .tarot-card .card-front .reversed-mark { position: absolute; top: 4px; right: 4px; font-size: 10px; color: var(--accent-red); }
+        .card-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; text-align: center; }
+        .control-area { text-align: center; margin-bottom: 20px; }
+        .flip-mode-toggle { display: flex; gap: 12px; justify-content: center; margin-bottom: 12px; }
+        .flip-mode-toggle label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+        .flip-mode-toggle input { accent-color: var(--accent-purple); }
+        .draw-btn { background: linear-gradient(135deg, var(--accent-purple), #8e44ad); color: white; border: none; padding: 14px 40px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px var(--glow-purple); }
+        .draw-btn:active { transform: scale(0.95); }
+        .draw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .flip-hint { color: var(--text-secondary); font-size: 13px; margin-top: 12px; display: none; }
+        .result-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-top: 20px; display: none; }
+        .result-section.show { display: block; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .result-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
+        .result-card-preview { width: 60px; height: 90px; background: linear-gradient(145deg, #f5f0e1, #e8dcc8); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 28px; color: #2d2d2d; flex-shrink: 0; }
+        .result-card-preview .name { font-size: 9px; font-weight: 600; margin-top: 2px; }
+        .result-info h3 { font-family: 'Noto Serif TC', serif; font-size: 18px; color: var(--text-gold); margin-bottom: 4px; }
+        .result-info .position { font-size: 12px; color: var(--accent-purple); margin-bottom: 6px; }
+        .result-info .keywords { display: flex; flex-wrap: wrap; gap: 5px; }
+        .keyword { background: rgba(155, 89, 182, 0.2); color: var(--accent-purple); padding: 3px 8px; border-radius: 10px; font-size: 10px; }
+        .keyword.reversed { background: rgba(231, 76, 60, 0.2); color: var(--accent-red); }
+        .fortune-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+        .fortune-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 6px; text-align: center; }
+        .fortune-item .icon { font-size: 20px; margin-bottom: 3px; }
+        .fortune-item .label { font-size: 10px; color: var(--text-secondary); margin-bottom: 2px; }
+        .fortune-item .score { font-size: 16px; font-weight: 700; }
         .fortune-item .score.high { color: var(--accent-green); }
         .fortune-item .score.mid { color: var(--accent-gold); }
         .fortune-item .score.low { color: var(--accent-red); }
-        
-        /* AI 解讀區 */
-        .ai-reading {
-            background: rgba(155, 89, 182, 0.1);
-            border: 1px solid rgba(155, 89, 182, 0.3);
-            border-radius: 14px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-        
-        .ai-reading-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--accent-purple);
-        }
-        
-        .ai-reading-content {
-            font-size: 14px;
-            line-height: 1.7;
-            color: var(--text-primary);
-        }
-        
-        .ai-reading-content.loading {
-            color: var(--text-secondary);
-            font-style: italic;
-        }
-        
-        /* 內容區塊 */
-        .content-block {
-            margin: 14px 0;
-        }
-        
-        .content-block h4 {
-            font-size: 13px;
-            color: var(--text-gold);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .content-block p {
-            font-size: 13px;
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-        
-        /* 按鈕組 */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        
-        .action-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .action-btn.primary {
-            background: linear-gradient(135deg, #00b900, #00c300);
-            color: white;
-        }
-        
-        .action-btn.secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-        
-        .action-btn.voice {
-            background: linear-gradient(135deg, var(--accent-purple), #8e44ad);
-            color: white;
-        }
-        
-        /* 底部導航 */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 430px;
-            margin: 0 auto;
-            background: rgba(22, 22, 31, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 10px 16px calc(10px + var(--safe-bottom));
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid var(--border-color);
-            z-index: 100;
-        }
-        
-        .nav-item {
-            text-align: center;
-            cursor: pointer;
-            opacity: 0.5;
-            transition: all 0.2s;
-            padding: 6px 12px;
-        }
-        
-        .nav-item.active {
-            opacity: 1;
-        }
-        
-        .nav-item .icon {
-            font-size: 22px;
-            margin-bottom: 3px;
-        }
-        
-        .nav-item .label {
-            font-size: 10px;
-        }
-        
-        /* 頁面容器 */
-        .page {
-            display: none;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        /* 歷史記錄頁 */
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .history-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .history-item:active {
-            transform: scale(0.98);
-        }
-        
-        .history-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .history-item-date {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        
-        .history-item-spread {
-            font-size: 11px;
-            background: rgba(155, 89, 182, 0.2);
-            color: var(--accent-purple);
-            padding: 3px 8px;
-            border-radius: 8px;
-        }
-        
-        .history-item-cards {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        
-        .history-card-mini {
-            font-size: 20px;
-        }
-        
-        .history-item-question {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* 統計頁 */
-        .stats-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        
-        .stats-card h3 {
-            font-size: 14px;
-            color: var(--text-gold);
-            margin-bottom: 12px;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 12px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-        }
-        
-        .stat-item .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-purple);
-        }
-        
-        .stat-item .label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-        
-        .top-cards-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .top-card-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-        }
-        
-        .top-card-item .rank {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-gold);
-            width: 24px;
-        }
-        
-        .top-card-item .card-icon {
-            font-size: 24px;
-        }
-        
-        .top-card-item .card-name {
-            flex: 1;
-            font-size: 14px;
-        }
-        
-        .top-card-item .count {
-            font-size: 14px;
-            color: var(--accent-purple);
-            font-weight: 600;
-        }
-        
-        /* 學習頁 */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        
-        .card-learn-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .card-learn-item:active {
-            transform: scale(0.95);
-        }
-        
-        .card-learn-item .icon {
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
-        
-        .card-learn-item .name {
-            font-size: 10px;
-            color: var(--text-secondary);
-        }
-        
-        /* 設定頁 */
-        .settings-section {
-            margin-bottom: 24px;
-        }
-        
-        .settings-section-title {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .settings-card {
-            background: var(--bg-secondary);
-            border-radius: 14px;
-            overflow: hidden;
-        }
-        
-        .settings-item {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .settings-item:last-child {
-            border-bottom: none;
-        }
-        
-        .settings-item label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        
-        .settings-item input,
-        .settings-item select {
-            width: 100%;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-        
-        .settings-item input:focus,
-        .settings-item select:focus {
-            outline: none;
-            border-color: var(--accent-purple);
-        }
-        
-        .settings-toggle {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .toggle-switch {
-            width: 50px;
-            height: 28px;
-            background: var(--bg-tertiary);
-            border-radius: 14px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .toggle-switch.active {
-            background: var(--accent-purple);
-        }
-        
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            top: 3px;
-            left: 3px;
-            transition: left 0.3s;
-        }
-        
-        .toggle-switch.active::after {
-            left: 25px;
-        }
-        
-        /* 模態框 */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            padding: 20px;
-        }
-        
-        .modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-content {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 360px;
-            max-height: 80vh;
-            overflow-y: auto;
-            transform: translateY(20px);
-            transition: transform 0.3s;
-        }
-        
-        .modal.show .modal-content {
-            transform: translateY(0);
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h3 {
-            font-size: 18px;
-            color: var(--text-gold);
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: calc(100px + var(--safe-bottom));
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 14px;
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1100;
-            white-space: nowrap;
-        }
-        
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        
-        /* 空狀態 */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-        
-        .empty-state .icon {
-            font-size: 60px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        
-        .empty-state p {
-            font-size: 14px;
-        }
+        .ai-reading { background: rgba(155, 89, 182, 0.1); border: 1px solid rgba(155, 89, 182, 0.3); border-radius: 14px; padding: 16px; margin: 16px 0; }
+        .ai-reading-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: var(--accent-purple); }
+        .ai-reading-content { font-size: 14px; line-height: 1.7; color: var(--text-primary); }
+        .ai-reading-content.loading { color: var(--text-secondary); font-style: italic; }
+        .content-block { margin: 14px 0; }
+        .content-block h4 { font-size: 13px; color: var(--text-gold); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+        .content-block p { font-size: 13px; color: var(--text-primary); line-height: 1.6; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 16px; }
+        .action-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn.primary { background: linear-gradient(135deg, #00b900, #00c300); color: white; }
+        .action-btn.secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .action-btn.voice { background: linear-gradient(135deg, var(--accent-purple), #8e44ad); color: white; }
+        
+        /* ===== 語音控制樣式 ===== */
+        .action-btn.voice.playing { background: linear-gradient(135deg, #e74c3c, #c0392b); animation: pulse-btn 1.5s ease-in-out infinite; }
+        .action-btn.voice.paused { background: linear-gradient(135deg, #f39c12, #d68910); }
+        @keyframes pulse-btn { 0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); } }
+        .voice-controls { display: flex; gap: 8px; margin-top: 10px; }
+        .voice-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; }
+        .voice-btn:active { transform: scale(0.95); }
+        .voice-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .voice-btn.pause { background: linear-gradient(135deg, #f39c12, #d68910); color: white; }
+        .voice-btn.stop { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+        .voice-btn.replay { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .voice-status { text-align: center; font-size: 12px; color: var(--text-secondary); margin-top: 8px; min-height: 18px; }
+        /* ===== 語音控制樣式結束 ===== */
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(22, 22, 31, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 10px 16px calc(10px + var(--safe-bottom)); display: flex; justify-content: space-around; border-top: 1px solid var(--border-color); z-index: 100; }
+        .nav-item { text-align: center; cursor: pointer; opacity: 0.5; transition: all 0.2s; padding: 6px 12px; }
+        .nav-item.active { opacity: 1; }
+        .nav-item .icon { font-size: 22px; margin-bottom: 3px; }
+        .nav-item .label { font-size: 10px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .history-item { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .history-item:active { transform: scale(0.98); }
+        .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .history-item-date { font-size: 12px; color: var(--text-secondary); }
+        .history-item-spread { font-size: 11px; background: rgba(155, 89, 182, 0.2); color: var(--accent-purple); padding: 3px 8px; border-radius: 8px; }
+        .history-item-cards { display: flex; gap: 6px; flex-wrap: wrap; }
+        .history-card-mini { font-size: 20px; }
+        .history-item-question { font-size: 13px; color: var(--text-secondary); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 40px; }
+        .history-delete-btn { position: absolute; bottom: 12px; right: 12px; background: rgba(231, 76, 60, 0.2); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .history-delete-btn:hover { background: rgba(231, 76, 60, 0.4); }
+        .history-delete-btn:active { transform: scale(0.9); }
+        .history-item-content { padding-right: 40px; }
+        .stats-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+        .stats-card h3 { font-size: 14px; color: var(--text-gold); margin-bottom: 12px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .stat-item { text-align: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+        .stat-item .value { font-size: 24px; font-weight: 700; color: var(--accent-purple); }
+        .stat-item .label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .top-cards-list { display: flex; flex-direction: column; gap: 8px; }
+        .top-card-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .top-card-item .rank { font-size: 14px; font-weight: 700; color: var(--text-gold); width: 24px; }
+        .top-card-item .card-icon { font-size: 24px; }
+        .top-card-item .card-name { flex: 1; font-size: 14px; }
+        .top-card-item .count { font-size: 14px; color: var(--accent-purple); font-weight: 600; }
+        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .card-learn-item { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .card-learn-item:active { transform: scale(0.95); }
+        .card-learn-item .icon { font-size: 28px; margin-bottom: 4px; }
+        .card-learn-item .name { font-size: 10px; color: var(--text-secondary); }
+        .settings-section { margin-bottom: 24px; }
+        .settings-section-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .settings-card { background: var(--bg-secondary); border-radius: 14px; overflow: hidden; }
+        .settings-item { padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item label { display: block; font-size: 14px; margin-bottom: 8px; }
+        .settings-item input, .settings-item select { width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; color: var(--text-primary); font-size: 14px; }
+        .settings-item input:focus, .settings-item select:focus { outline: none; border-color: var(--accent-purple); }
+        .settings-toggle { display: flex; justify-content: space-between; align-items: center; }
+        .toggle-switch { width: 50px; height: 28px; background: var(--bg-tertiary); border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.active { background: var(--accent-purple); }
+        .toggle-switch::after { content: ''; position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: left 0.3s; }
+        .toggle-switch.active::after { left: 25px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; padding: 20px; }
+        .modal.show { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-secondary); border-radius: 20px; width: 100%; max-width: 360px; max-height: 80vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s; }
+        .modal.show .modal-content { transform: translateY(0); }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; color: var(--text-gold); }
+        .modal-close { background: none; border: none; font-size: 24px; color: var(--text-secondary); cursor: pointer; }
+        .modal-body { padding: 20px; }
+        .toast { position: fixed; bottom: calc(100px + var(--safe-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--bg-tertiary); color: var(--text-primary); padding: 12px 24px; border-radius: 25px; font-size: 14px; opacity: 0; transition: all 0.3s ease; z-index: 1100; white-space: nowrap; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state .icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state p { font-size: 14px; }
     </style>
 </head>
 <body>
-    <!-- 開機動畫 -->
     <div class="splash-screen" id="splashScreen">
-        <div class="particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-        </div>
-        
+        <div class="particles"><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div></div>
         <div class="splash-container">
-            <div class="bagua-ring">
-                <span class="bagua-symbol">☰</span>
-                <span class="bagua-symbol">☱</span>
-                <span class="bagua-symbol">☲</span>
-                <span class="bagua-symbol">☳</span>
-                <span class="bagua-symbol">☴</span>
-                <span class="bagua-symbol">☵</span>
-                <span class="bagua-symbol">☶</span>
-                <span class="bagua-symbol">☷</span>
-            </div>
-            <div class="ring-1"></div>
-            <div class="ring-2"></div>
-            <div class="ring-3"></div>
+            <div class="bagua-ring"><span class="bagua-symbol">☰</span><span class="bagua-symbol">☱</span><span class="bagua-symbol">☲</span><span class="bagua-symbol">☳</span><span class="bagua-symbol">☴</span><span class="bagua-symbol">☵</span><span class="bagua-symbol">☶</span><span class="bagua-symbol">☷</span></div>
+            <div class="ring-1"></div><div class="ring-2"></div><div class="ring-3"></div>
             <div class="splash-text">卦</div>
         </div>
-        
-        <div class="splash-loading">
-            <div class="splash-title">AI 塔羅占卜</div>
-            <div class="splash-subtitle">LOADING...</div>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-            </div>
-        </div>
+        <div class="splash-loading"><div class="splash-title">AI 塔羅占卜</div><div class="splash-subtitle">LOADING...</div><div class="progress-bar"><div class="progress-fill"></div></div></div>
     </div>
 
     <div class="app-container">
-        <!-- 狀態列 -->
-        <div class="status-bar">
-            <div class="dynamic-island"></div>
-            <span id="statusTime">9:41</span>
-            <span>🔮</span>
-        </div>
+        <div class="status-bar"><div class="dynamic-island"></div><span id="statusTime">9:41</span><span>🔮</span></div>
+        <div class="top-toolbar"><button class="toolbar-btn" onclick="toggleSound()">🔊</button><button class="toolbar-btn" onclick="showPage('settings')">⚙️</button></div>
         
-        <!-- 頂部工具列 -->
-        <div class="top-toolbar">
-            <button class="toolbar-btn" onclick="toggleSound()">🔊</button>
-            <button class="toolbar-btn" onclick="showPage('settings')">⚙️</button>
-        </div>
-        
-        <!-- 主內容 -->
         <div class="main-content">
-            <!-- 占卜頁 -->
             <div class="page active" id="page-divine">
-                <div class="header">
-                    <div class="header-icon">🔮</div>
-                    <h1>AI 塔羅占卜</h1>
-                    <p>選擇牌陣 · 輸入問題 · AI 解讀</p>
-                </div>
-                
-                <!-- 牌陣選擇 -->
-                <div class="spread-selector" id="spreadSelector">
-                    <button class="spread-btn active" data-spread="single">🎴 單牌</button>
-                    <button class="spread-btn" data-spread="yesno">❓ 是非題</button>
-                    <button class="spread-btn" data-spread="timeline">⏳ 時間之流</button>
-                    <button class="spread-btn" data-spread="love">💕 愛情</button>
-                    <button class="spread-btn" data-spread="career">💼 事業</button>
-                    <button class="spread-btn" data-spread="daily">☀️ 每日</button>
-                </div>
-                
-                <!-- 問題輸入 -->
-                <div class="question-input">
-                    <input type="text" id="questionInput" placeholder="輸入你想問的問題（選填）...">
-                </div>
-                
-                <!-- 塔羅牌區 -->
-                <div class="tarot-area">
-                    <div class="tarot-spread" id="tarotSpread">
-                        <!-- 動態生成 -->
-                    </div>
-                </div>
-                
-                <!-- 控制區 -->
+                <div class="header"><div class="header-icon">🔮</div><h1>AI 塔羅占卜</h1><p>選擇牌陣 · 輸入問題 · AI 解讀</p></div>
+                <div class="spread-selector" id="spreadSelector"><button class="spread-btn active" data-spread="single">🎴 單牌</button><button class="spread-btn" data-spread="yesno">❓ 是非題</button><button class="spread-btn" data-spread="timeline">⏳ 時間之流</button><button class="spread-btn" data-spread="love">💕 愛情</button><button class="spread-btn" data-spread="career">💼 事業</button><button class="spread-btn" data-spread="daily">☀️ 每日</button></div>
+                <div class="question-input"><input type="text" id="questionInput" placeholder="輸入你想問的問題（選填）..."></div>
+                <div class="tarot-area"><div class="tarot-spread" id="tarotSpread"></div></div>
                 <div class="control-area">
-                    <div class="flip-mode-toggle">
-                        <label>
-                            <input type="radio" name="flipMode" value="auto" checked> 🎬 自動翻牌
-                        </label>
-                        <label>
-                            <input type="radio" name="flipMode" value="manual"> 👆 手動翻牌
-                        </label>
-                    </div>
+                    <div class="flip-mode-toggle"><label><input type="radio" name="flipMode" value="auto" checked> 🎬 自動翻牌</label><label><input type="radio" name="flipMode" value="manual"> 👆 手動翻牌</label></div>
                     <button class="draw-btn" id="drawBtn" onclick="startDivine()">🔮 開始占卜</button>
                     <p class="flip-hint" id="flipHint">👆 點擊卡牌翻牌</p>
                 </div>
-                
-                <!-- 結果區 -->
                 <div class="result-section" id="resultSection">
-                    <div class="result-header" id="resultHeader">
-                        <!-- 動態生成 -->
-                    </div>
-                    
+                    <div class="result-header" id="resultHeader"></div>
                     <div class="fortune-grid" id="fortuneGrid">
-                        <div class="fortune-item">
-                            <div class="icon">⭐</div>
-                            <div class="label">整體</div>
-                            <div class="score high" id="scoreOverall">85</div>
-                        </div>
-                        <div class="fortune-item">
-                            <div class="icon">💕</div>
-                            <div class="label">愛情</div>
-                            <div class="score mid" id="scoreLove">70</div>
-                        </div>
-                        <div class="fortune-item">
-                            <div class="icon">💼</div>
-                            <div class="label">事業</div>
-                            <div class="score high" id="scoreCareer">80</div>
-                        </div>
-                        <div class="fortune-item">
-                            <div class="icon">💰</div>
-                            <div class="label">財運</div>
-                            <div class="score mid" id="scoreWealth">65</div>
-                        </div>
+                        <div class="fortune-item"><div class="icon">⭐</div><div class="label">整體</div><div class="score high" id="scoreOverall">85</div></div>
+                        <div class="fortune-item"><div class="icon">💕</div><div class="label">愛情</div><div class="score mid" id="scoreLove">70</div></div>
+                        <div class="fortune-item"><div class="icon">💼</div><div class="label">事業</div><div class="score high" id="scoreCareer">80</div></div>
+                        <div class="fortune-item"><div class="icon">💰</div><div class="label">財運</div><div class="score mid" id="scoreWealth">65</div></div>
                     </div>
+                    <div class="ai-reading" id="aiReading"><div class="ai-reading-header"><span>🤖</span> AI 智慧解讀</div><div class="ai-reading-content" id="aiReadingContent">載入中...</div></div>
+                    <div class="content-block"><h4>📖 牌義解讀</h4><p id="cardMeaning">牌義內容...</p></div>
+                    <div class="content-block"><h4>💡 建議</h4><p id="cardAdvice">建議內容...</p></div>
                     
-                    <!-- AI 解讀 -->
-                    <div class="ai-reading" id="aiReading">
-                        <div class="ai-reading-header">
-                            <span>🤖</span> AI 智慧解讀
-                        </div>
-                        <div class="ai-reading-content" id="aiReadingContent">
-                            載入中...
-                        </div>
-                    </div>
-                    
-                    <div class="content-block">
-                        <h4>📖 牌義解讀</h4>
-                        <p id="cardMeaning">牌義內容...</p>
-                    </div>
-                    
-                    <div class="content-block">
-                        <h4>💡 建議</h4>
-                        <p id="cardAdvice">建議內容...</p>
-                    </div>
-                    
+                    <!-- 語音播放區（已修改支援暫停/停止/重播）-->
                     <div class="action-buttons">
-                        <button class="action-btn voice" onclick="speakResult()">
-                            🔊 語音播報
-                        </button>
-                        <button class="action-btn primary" onclick="sendToLine()">
-                            📱 發送 LINE
-                        </button>
+                        <button class="action-btn voice" id="voiceMainBtn" onclick="toggleSpeech()">🔊 語音播報</button>
+                        <button class="action-btn primary" onclick="sendToLine()">📱 發送 LINE</button>
                     </div>
+                    <div class="voice-controls" id="voiceControls" style="display: none;">
+                        <button class="voice-btn pause" id="voicePauseBtn" onclick="pauseSpeech()">⏸️ 暫停</button>
+                        <button class="voice-btn stop" id="voiceStopBtn" onclick="stopSpeech()">⏹️ 停止</button>
+                        <button class="voice-btn replay" id="voiceReplayBtn" onclick="replaySpeech()">🔄 重播</button>
+                    </div>
+                    <div class="voice-status" id="voiceStatus"></div>
                 </div>
             </div>
             
-            <!-- 歷史頁 -->
-            <div class="page" id="page-history">
-                <div class="header">
-                    <div class="header-icon">📜</div>
-                    <h1>占卜記錄</h1>
-                    <p>回顧過去的占卜結果</p>
-                </div>
-                
-                <div class="history-list" id="historyList">
-                    <!-- 動態生成 -->
-                </div>
-            </div>
-            
-            <!-- 統計頁 -->
-            <div class="page" id="page-stats">
-                <div class="header">
-                    <div class="header-icon">📊</div>
-                    <h1>占卜統計</h1>
-                    <p>你的塔羅數據分析</p>
-                </div>
-                
-                <div class="stats-card">
-                    <h3>📈 總覽</h3>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="value" id="statTotal">0</div>
-                            <div class="label">總占卜次數</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="value" id="statThisWeek">0</div>
-                            <div class="label">本週次數</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="value" id="statAvgScore">--</div>
-                            <div class="label">平均運勢</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="value" id="statStreak">0</div>
-                            <div class="label">連續天數</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="stats-card">
-                    <h3>🃏 最常抽到的牌</h3>
-                    <div class="top-cards-list" id="topCardsList">
-                        <!-- 動態生成 -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 學習頁 -->
-            <div class="page" id="page-learn">
-                <div class="header">
-                    <div class="header-icon">📚</div>
-                    <h1>牌義教學</h1>
-                    <p>認識 22 張大阿爾克那</p>
-                </div>
-                
-                <div class="card-grid" id="cardGrid">
-                    <!-- 動態生成 -->
-                </div>
-            </div>
-            
-            <!-- 設定頁 -->
-            <div class="page" id="page-settings">
-                <div class="header">
-                    <div class="header-icon">⚙️</div>
-                    <h1>設定</h1>
-                    <p>自訂你的占卜體驗</p>
-                </div>
-                
-                <div class="settings-section">
-                    <div class="settings-section-title">AI 設定</div>
-                    <div class="settings-card">
-                        <div class="settings-item">
-                            <label>Groq API Key</label>
-                            <input type="password" id="groqApiKey" placeholder="輸入 Groq API Key">
-                        </div>
-                        <div class="settings-item">
-                            <label>AI 模型</label>
-                            <select id="aiModel">
-                                <option value="llama-3.3-70b-versatile">Llama 3.3 70B (推薦)</option>
-                                <option value="llama-3.1-8b-instant">Llama 3.1 8B (快速)</option>
-                                <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-section">
-                    <div class="settings-section-title">語音設定</div>
-                    <div class="settings-card">
-                        <div class="settings-item">
-                            <label>語音服務</label>
-                            <select id="voiceService">
-                                <option value="web">Web Speech (免費)</option>
-                                <option value="gemini">Gemini TTS</option>
-                                <option value="elevenlabs">ElevenLabs</option>
-                            </select>
-                        </div>
-                        <div class="settings-item">
-                            <label>Gemini API Key</label>
-                            <input type="password" id="geminiApiKey" placeholder="輸入 Gemini API Key">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-section">
-                    <div class="settings-section-title">LINE 通知</div>
-                    <div class="settings-card">
-                        <div class="settings-item">
-                            <label>GAS Web App URL</label>
-                            <input type="text" id="gasUrl" placeholder="https://script.google.com/...">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-section">
-                    <div class="settings-section-title">占卜設定</div>
-                    <div class="settings-card">
-                        <div class="settings-item settings-toggle">
-                            <label>啟用正逆位</label>
-                            <div class="toggle-switch" id="toggleReversed" onclick="toggleReversedSetting()"></div>
-                        </div>
-                        <div class="settings-item settings-toggle">
-                            <label>音效</label>
-                            <div class="toggle-switch active" id="toggleSfx" onclick="toggleSfxSetting()"></div>
-                        </div>
-                        <div class="settings-item settings-toggle">
-                            <label>背景音樂</label>
-                            <div class="toggle-switch" id="toggleBgm" onclick="toggleBgmSetting()"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-section">
-                    <div class="settings-section-title">資料管理</div>
-                    <div class="settings-card">
-                        <div class="settings-item">
-                            <button class="action-btn secondary" onclick="exportData()" style="width: 100%;">
-                                📤 匯出資料
-                            </button>
-                        </div>
-                        <div class="settings-item">
-                            <button class="action-btn secondary" onclick="clearHistory()" style="width: 100%; color: var(--accent-red);">
-                                🗑️ 清除歷史記錄
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="page" id="page-history"><div class="header"><div class="header-icon">📜</div><h1>占卜記錄</h1><p>回顧過去的占卜結果</p></div><div class="history-list" id="historyList"></div></div>
+            <div class="page" id="page-stats"><div class="header"><div class="header-icon">📊</div><h1>占卜統計</h1><p>你的塔羅數據分析</p></div><div class="stats-card"><h3>📈 總覽</h3><div class="stats-grid"><div class="stat-item"><div class="value" id="statTotal">0</div><div class="label">總占卜次數</div></div><div class="stat-item"><div class="value" id="statThisWeek">0</div><div class="label">本週次數</div></div><div class="stat-item"><div class="value" id="statAvgScore">--</div><div class="label">平均運勢</div></div><div class="stat-item"><div class="value" id="statStreak">0</div><div class="label">連續天數</div></div></div></div><div class="stats-card"><h3>🃏 最常抽到的牌</h3><div class="top-cards-list" id="topCardsList"></div></div></div>
+            <div class="page" id="page-learn"><div class="header"><div class="header-icon">📚</div><h1>牌義教學</h1><p>認識 22 張大阿爾克那</p></div><div class="card-grid" id="cardGrid"></div></div>
+            <div class="page" id="page-settings"><div class="header"><div class="header-icon">⚙️</div><h1>設定</h1><p>自訂你的占卜體驗</p></div><div class="settings-section"><div class="settings-section-title">AI 設定</div><div class="settings-card"><div class="settings-item"><label>Groq API Key</label><input type="password" id="groqApiKey" placeholder="輸入 Groq API Key"></div><div class="settings-item"><label>AI 模型</label><select id="aiModel"><option value="llama-3.3-70b-versatile">Llama 3.3 70B (推薦)</option><option value="llama-3.1-8b-instant">Llama 3.1 8B (快速)</option><option value="mixtral-8x7b-32768">Mixtral 8x7B</option></select></div></div></div><div class="settings-section"><div class="settings-section-title">語音設定</div><div class="settings-card"><div class="settings-item"><label>語音服務</label><select id="voiceService"><option value="web">Web Speech (免費)</option><option value="gemini">Gemini TTS</option><option value="elevenlabs">ElevenLabs</option></select></div><div class="settings-item"><label>Gemini API Key</label><input type="password" id="geminiApiKey" placeholder="輸入 Gemini API Key"></div></div></div><div class="settings-section"><div class="settings-section-title">LINE 通知</div><div class="settings-card"><div class="settings-item"><label>GAS Web App URL</label><input type="text" id="gasUrl" placeholder="https://script.google.com/..."></div></div></div><div class="settings-section"><div class="settings-section-title">占卜設定</div><div class="settings-card"><div class="settings-item settings-toggle"><label>啟用正逆位</label><div class="toggle-switch" id="toggleReversed" onclick="toggleReversedSetting()"></div></div><div class="settings-item settings-toggle"><label>音效</label><div class="toggle-switch active" id="toggleSfx" onclick="toggleSfxSetting()"></div></div><div class="settings-item settings-toggle"><label>背景音樂</label><div class="toggle-switch" id="toggleBgm" onclick="toggleBgmSetting()"></div></div></div></div><div class="settings-section"><div class="settings-section-title">資料管理</div><div class="settings-card"><div class="settings-item"><button class="action-btn secondary" onclick="exportData()" style="width: 100%;">📤 匯出資料</button></div><div class="settings-item"><button class="action-btn secondary" onclick="clearHistory()" style="width: 100%; color: var(--accent-red);">🗑️ 清除歷史記錄</button></div></div></div></div>
         </div>
         
-        <!-- 底部導航 -->
         <div class="bottom-nav">
-            <div class="nav-item active" onclick="showPage('divine')">
-                <div class="icon">🔮</div>
-                <div class="label">占卜</div>
-            </div>
-            <div class="nav-item" onclick="showPage('history')">
-                <div class="icon">📜</div>
-                <div class="label">歷史</div>
-            </div>
-            <div class="nav-item" onclick="showPage('stats')">
-                <div class="icon">📊</div>
-                <div class="label">統計</div>
-            </div>
-            <div class="nav-item" onclick="showPage('learn')">
-                <div class="icon">📚</div>
-                <div class="label">學習</div>
-            </div>
+            <div class="nav-item active" onclick="showPage('divine')"><div class="icon">🔮</div><div class="label">占卜</div></div>
+            <div class="nav-item" onclick="showPage('history')"><div class="icon">📜</div><div class="label">歷史</div></div>
+            <div class="nav-item" onclick="showPage('stats')"><div class="icon">📊</div><div class="label">統計</div></div>
+            <div class="nav-item" onclick="showPage('learn')"><div class="icon">📚</div><div class="label">學習</div></div>
         </div>
     </div>
     
-    <!-- 牌義詳情模態框 -->
-    <div class="modal" id="cardDetailModal">
+    <div class="modal" id="cardDetailModal"><div class="modal-content"><div class="modal-header"><h3 id="modalCardName">愚者</h3><button class="modal-close" onclick="closeModal('cardDetailModal')">×</button></div><div class="modal-body"><div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 60px;" id="modalCardIcon">🃏</span><p style="color: var(--text-secondary); font-size: 14px;" id="modalCardEnName">The Fool</p></div><div class="content-block"><h4>🔑 關鍵詞</h4><div id="modalKeywords" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;"></div></div><div class="content-block"><h4>📖 正位牌義</h4><p id="modalMeaningUpright"></p></div><div class="content-block"><h4>🔄 逆位牌義</h4><p id="modalMeaningReversed"></p></div><div class="content-block"><h4>💡 建議</h4><p id="modalAdvice"></p></div></div></div></div>
+    
+    <!-- 歷史詳情 Modal -->
+    <div class="modal" id="historyDetailModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalCardName">愚者</h3>
-                <button class="modal-close" onclick="closeModal('cardDetailModal')">×</button>
+                <h3 id="historyModalTitle">📜 占卜記錄</h3>
+                <button class="modal-close" onclick="closeModal('historyDetailModal')">×</button>
             </div>
             <div class="modal-body">
-                <div style="text-align: center; margin-bottom: 16px;">
-                    <span style="font-size: 60px;" id="modalCardIcon">🃏</span>
-                    <p style="color: var(--text-secondary); font-size: 14px;" id="modalCardEnName">The Fool</p>
+                <div id="historyModalDate" style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;"></div>
+                <div id="historyModalCards" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 16px;"></div>
+                <div id="historyModalQuestion" style="background: rgba(155, 89, 182, 0.1); padding: 12px; border-radius: 10px; margin-bottom: 16px; display: none;">
+                    <div style="font-size: 12px; color: var(--accent-purple); margin-bottom: 4px;">❓ 提問</div>
+                    <div id="historyModalQuestionText" style="font-size: 14px;"></div>
                 </div>
-                <div class="content-block">
-                    <h4>🔑 關鍵詞</h4>
-                    <div id="modalKeywords" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;"></div>
-                </div>
-                <div class="content-block">
-                    <h4>📖 正位牌義</h4>
-                    <p id="modalMeaningUpright"></p>
-                </div>
-                <div class="content-block">
-                    <h4>🔄 逆位牌義</h4>
-                    <p id="modalMeaningReversed"></p>
-                </div>
-                <div class="content-block">
-                    <h4>💡 建議</h4>
-                    <p id="modalAdvice"></p>
+                <div class="fortune-grid" id="historyModalScores" style="margin-bottom: 16px;"></div>
+                <div id="historyModalAiReading" class="ai-reading" style="display: none;">
+                    <div class="ai-reading-header"><span>🤖</span> AI 智慧解讀</div>
+                    <div class="ai-reading-content" id="historyModalAiText"></div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
-    
-    <!-- 音效 -->
-    <audio id="sfxShuffle" preload="auto">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
-    </audio>
-    <audio id="sfxFlip" preload="auto">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
-    </audio>
 
     <script>
-        // ============================================
-        // 塔羅牌資料庫（大阿爾克那 22 張 + 正逆位）
-        // ============================================
         const tarotDeck = [
-            { 
-                id: 0, name: '愚者', enName: 'The Fool', icon: '🃏',
-                keywords: ['新開始', '冒險', '純真', '自由'],
-                keywordsReversed: ['魯莽', '愚蠢', '冒失', '不成熟'],
-                meaning: '愚者代表著新的開始和無限的可能性。它象徵著勇於冒險、保持純真的心態，以及對未知世界的好奇與探索。',
-                meaningReversed: '逆位的愚者暗示著魯莽行事、缺乏計劃，或者對風險視而不見。需要更謹慎地評估情況。',
-                advice: '保持開放的心態，勇於嘗試新事物，但也要適度評估風險。'
-            },
-            { 
-                id: 1, name: '魔術師', enName: 'The Magician', icon: '🎩',
-                keywords: ['創造力', '意志力', '技能', '行動'],
-                keywordsReversed: ['欺騙', '操控', '才能浪費', '缺乏方向'],
-                meaning: '魔術師代表著強大的創造力和行動力。你擁有將想法化為現實的能力，所有資源都已齊備。',
-                meaningReversed: '逆位的魔術師可能暗示欺騙、操控，或者才能未被善用。需要誠實面對自己。',
-                advice: '善用你的技能和資源，主動出擊會有好結果。'
-            },
-            { 
-                id: 2, name: '女祭司', enName: 'The High Priestess', icon: '🌙',
-                keywords: ['直覺', '神秘', '智慧', '潛意識'],
-                keywordsReversed: ['壓抑直覺', '秘密', '表面', '混亂'],
-                meaning: '女祭司代表著深層的直覺和內在智慧。她提醒你傾聽內心的聲音，關注夢境和潛意識的訊息。',
-                meaningReversed: '逆位的女祭司暗示忽略內心聲音、過於依賴表面資訊，或有隱藏的秘密。',
-                advice: '靜下心來傾聽內心的指引，答案就在你心中。'
-            },
-            { 
-                id: 3, name: '女皇', enName: 'The Empress', icon: '👑',
-                keywords: ['豐盛', '母性', '創造', '美麗'],
-                keywordsReversed: ['依賴', '空虛', '創造力阻塞', '忽視自我'],
-                meaning: '女皇代表著豐盛與創造力。她象徵著生命的滋養、物質的富足，以及藝術美感的展現。',
-                meaningReversed: '逆位的女皇可能表示過度依賴、創造力受阻，或者忽視了自我照顧。',
-                advice: '享受生活中的美好事物，關愛身邊的人。'
-            },
-            { 
-                id: 4, name: '皇帝', enName: 'The Emperor', icon: '🏰',
-                keywords: ['權威', '穩定', '領導', '保護'],
-                keywordsReversed: ['專制', '僵化', '控制慾', '不成熟'],
-                meaning: '皇帝代表著權威和穩定的力量。他象徵著理性思維、紀律和建立秩序的能力。',
-                meaningReversed: '逆位的皇帝可能暗示過度控制、僵化思維，或者缺乏領導力。',
-                advice: '展現你的領導才能，制定明確的計劃。'
-            },
-            { 
-                id: 5, name: '教皇', enName: 'The Hierophant', icon: '⛪',
-                keywords: ['傳統', '指導', '信仰', '教育'],
-                keywordsReversed: ['打破傳統', '個人信念', '反叛', '新方法'],
-                meaning: '教皇代表著傳統價值和精神指導。他提醒我們尊重傳統智慧，同時也代表著教育和學習。',
-                meaningReversed: '逆位的教皇可能暗示需要打破常規、建立個人信念，或質疑權威。',
-                advice: '向有經驗的人請教，遵循正確的方法和程序。'
-            },
-            { 
-                id: 6, name: '戀人', enName: 'The Lovers', icon: '💕',
-                keywords: ['愛情', '選擇', '和諧', '價值觀'],
-                keywordsReversed: ['不和諧', '價值衝突', '錯誤選擇', '不平衡'],
-                meaning: '戀人牌代表著愛情和重要的選擇。它象徵著內心價值觀的統一，以及與他人建立深層連結。',
-                meaningReversed: '逆位的戀人可能暗示關係不和諧、價值觀衝突，或面臨困難的選擇。',
-                advice: '傾聽你的心，做出符合價值觀的選擇。'
-            },
-            { 
-                id: 7, name: '戰車', enName: 'The Chariot', icon: '🏎️',
-                keywords: ['勝利', '意志', '決心', '控制'],
-                keywordsReversed: ['失控', '侵略', '缺乏方向', '挫敗'],
-                meaning: '戰車代表著勝利和前進的動力。它象徵著克服障礙的決心，以及對方向的掌控。',
-                meaningReversed: '逆位的戰車可能暗示失去控制、方向迷失，或過度侵略。',
-                advice: '保持專注和決心，積極採取行動。'
-            },
-            { 
-                id: 8, name: '力量', enName: 'Strength', icon: '🦁',
-                keywords: ['勇氣', '耐心', '內在力量', '慈悲'],
-                keywordsReversed: ['自我懷疑', '軟弱', '缺乏自信', '濫用力量'],
-                meaning: '力量牌代表著內在的勇氣和耐心。真正的力量來自於溫柔和自我控制，而非蠻力。',
-                meaningReversed: '逆位的力量暗示自我懷疑、缺乏信心，或者濫用個人力量。',
-                advice: '以柔克剛，用耐心和愛心面對挑戰。'
-            },
-            { 
-                id: 9, name: '隱士', enName: 'The Hermit', icon: '🏔️',
-                keywords: ['內省', '智慧', '獨處', '尋找'],
-                keywordsReversed: ['孤立', '逃避', '拒絕幫助', '迷失'],
-                meaning: '隱士代表著內在的探索和智慧的追尋。他提醒我們有時需要獨處來找到人生的答案。',
-                meaningReversed: '逆位的隱士可能暗示過度孤立、逃避現實，或拒絕他人的幫助。',
-                advice: '給自己一些獨處的時間，反思和沉澱。'
-            },
-            { 
-                id: 10, name: '命運之輪', enName: 'Wheel of Fortune', icon: '🎡',
-                keywords: ['轉變', '機會', '命運', '週期'],
-                keywordsReversed: ['壞運', '抗拒改變', '失控', '延遲'],
-                meaning: '命運之輪代表著生命的循環和轉變。它提醒我們世事無常，好運和挑戰都是暫時的。',
-                meaningReversed: '逆位的命運之輪可能暗示運氣不佳、抗拒必要的改變，或事情進展緩慢。',
-                advice: '把握當下的機會，順應變化的潮流。'
-            },
-            { 
-                id: 11, name: '正義', enName: 'Justice', icon: '⚖️',
-                keywords: ['公平', '真相', '因果', '決斷'],
-                keywordsReversed: ['不公平', '逃避責任', '偏見', '欺騙'],
-                meaning: '正義牌代表著公平和真相。它提醒我們每個行為都有後果，要為自己的選擇負責。',
-                meaningReversed: '逆位的正義暗示不公平的對待、逃避責任，或存在偏見。',
-                advice: '誠實面對自己和他人，做出公正的決定。'
-            },
-            { 
-                id: 12, name: '倒吊人', enName: 'The Hanged Man', icon: '🙃',
-                keywords: ['犧牲', '等待', '新視角', '放下'],
-                keywordsReversed: ['拖延', '抗拒', '無意義犧牲', '僵局'],
-                meaning: '倒吊人代表著暫停和換個角度看問題。有時候放手和等待會帶來意想不到的收穫。',
-                meaningReversed: '逆位的倒吊人可能暗示無意義的拖延、抗拒必要的改變，或陷入僵局。',
-                advice: '嘗試用不同的角度看待問題，有時候等待也是一種智慧。'
-            },
-            { 
-                id: 13, name: '死神', enName: 'Death', icon: '🦋',
-                keywords: ['結束', '轉變', '重生', '放下過去'],
-                keywordsReversed: ['抗拒改變', '停滯', '無法放手', '恐懼'],
-                meaning: '死神牌代表著結束和轉變。它象徵著舊事物的終結，為新的開始清出空間。',
-                meaningReversed: '逆位的死神暗示抗拒必要的改變、無法放下過去，或停滯不前。',
-                advice: '放下不再需要的事物，擁抱改變。每個結束都是新的開始。'
-            },
-            { 
-                id: 14, name: '節制', enName: 'Temperance', icon: '🏺',
-                keywords: ['平衡', '調和', '耐心', '適度'],
-                keywordsReversed: ['失衡', '過度', '缺乏耐心', '衝突'],
-                meaning: '節制代表著平衡和調和。它提醒我們在生活中保持中庸之道，避免極端。',
-                meaningReversed: '逆位的節制暗示生活失衡、過度縱慾，或缺乏耐心。',
-                advice: '保持平衡的生活方式，不要操之過急。'
-            },
-            { 
-                id: 15, name: '惡魔', enName: 'The Devil', icon: '😈',
-                keywords: ['束縛', '誘惑', '慾望', '陰影'],
-                keywordsReversed: ['解脫', '覺醒', '打破束縛', '恢復力量'],
-                meaning: '惡魔牌代表著內心的束縛和誘惑。它提醒我們正視自己的陰暗面，打破自我設限。',
-                meaningReversed: '逆位的惡魔暗示正在掙脫束縛、覺醒中，或重新獲得個人力量。',
-                advice: '檢視什麼在束縛你，是時候打破不健康的模式了。'
-            },
-            { 
-                id: 16, name: '高塔', enName: 'The Tower', icon: '🗼',
-                keywords: ['突變', '覺醒', '解放', '真相'],
-                keywordsReversed: ['逃避災難', '恐懼改變', '延遲崩塌', '個人轉變'],
-                meaning: '高塔代表著突然的變化和舊結構的崩塌。雖然令人不安，但它為重建帶來機會。',
-                meaningReversed: '逆位的高塔可能暗示正在避免災難、恐懼必要的改變，或內在的轉變。',
-                advice: '準備迎接變化，有些事情需要被打破才能重建得更好。'
-            },
-            { 
-                id: 17, name: '星星', enName: 'The Star', icon: '⭐',
-                keywords: ['希望', '靈感', '平靜', '信心'],
-                keywordsReversed: ['絕望', '缺乏信心', '失去方向', '創意阻塞'],
-                meaning: '星星代表著希望和靈感。它象徵著困難過後的平靜，以及對美好未來的信心。',
-                meaningReversed: '逆位的星星暗示失去希望、缺乏信心，或感到迷失。',
-                advice: '保持希望和信心，美好的事物正在向你靠近。'
-            },
-            { 
-                id: 18, name: '月亮', enName: 'The Moon', icon: '🌕',
-                keywords: ['幻覺', '潛意識', '恐懼', '直覺'],
-                keywordsReversed: ['走出恐懼', '真相揭露', '釋放焦慮', '清晰'],
-                meaning: '月亮代表著潛意識和直覺。它提醒我們關注夢境和內心深處的感受，但也要小心幻覺。',
-                meaningReversed: '逆位的月亮暗示走出恐懼、真相逐漸清晰，或釋放內心焦慮。',
-                advice: '信任你的直覺，但也要分辨幻覺和現實。'
-            },
-            { 
-                id: 19, name: '太陽', enName: 'The Sun', icon: '☀️',
-                keywords: ['成功', '喜悅', '活力', '光明'],
-                keywordsReversed: ['暫時挫折', '過度樂觀', '延遲的成功', '尋找快樂'],
-                meaning: '太陽是最正面的牌之一，代表著成功、喜悅和充沛的能量。一切都會變得光明。',
-                meaningReversed: '逆位的太陽暗示暫時的挫折、過度樂觀，或需要尋找內在的快樂。',
-                advice: '充滿自信地前進！今天是充滿能量和正向發展的一天。'
-            },
-            { 
-                id: 20, name: '審判', enName: 'Judgement', icon: '📯',
-                keywords: ['覺醒', '更新', '召喚', '反思'],
-                keywordsReversed: ['自我懷疑', '拒絕反省', '錯過機會', '內疚'],
-                meaning: '審判代表著覺醒和重生的召喚。它提醒我們反思過去，準備迎接新的人生階段。',
-                meaningReversed: '逆位的審判暗示自我懷疑、拒絕反省過去，或被內疚困擾。',
-                advice: '傾聽內心的召喚，做出重要的人生決定。'
-            },
-            { 
-                id: 21, name: '世界', enName: 'The World', icon: '🌍',
-                keywords: ['完成', '圓滿', '成就', '整合'],
-                keywordsReversed: ['未完成', '缺乏結局', '延遲', '空虛'],
-                meaning: '世界是大阿爾克那的最後一張牌，代表著一個週期的完成和圓滿。你已經達成了目標。',
-                meaningReversed: '逆位的世界暗示事情尚未完成、缺乏圓滿感，或目標延遲。',
-                advice: '慶祝你的成就！一個階段已經圓滿完成，新的旅程即將展開。'
-            }
+            { id: 0, name: '愚者', enName: 'The Fool', icon: '🃏', keywords: ['新開始', '冒險', '純真', '自由'], keywordsReversed: ['魯莽', '愚蠢', '冒失', '不成熟'], meaning: '愚者代表著新的開始和無限的可能性。它象徵著勇於冒險、保持純真的心態，以及對未知世界的好奇與探索。', meaningReversed: '逆位的愚者暗示著魯莽行事、缺乏計劃，或者對風險視而不見。', advice: '保持開放的心態，勇於嘗試新事物，但也要適度評估風險。' },
+            { id: 1, name: '魔術師', enName: 'The Magician', icon: '🎩', keywords: ['創造力', '意志力', '技能', '行動'], keywordsReversed: ['欺騙', '操控', '才能浪費', '缺乏方向'], meaning: '魔術師代表著強大的創造力和行動力。你擁有將想法化為現實的能力，所有資源都已齊備。', meaningReversed: '逆位的魔術師可能暗示欺騙、操控，或者才能未被善用。', advice: '善用你的技能和資源，主動出擊會有好結果。' },
+            { id: 2, name: '女祭司', enName: 'The High Priestess', icon: '🌙', keywords: ['直覺', '神秘', '智慧', '潛意識'], keywordsReversed: ['壓抑直覺', '秘密', '表面', '混亂'], meaning: '女祭司代表著深層的直覺和內在智慧。她提醒你傾聽內心的聲音。', meaningReversed: '逆位的女祭司暗示忽略內心聲音、過於依賴表面資訊。', advice: '靜下心來傾聽內心的指引，答案就在你心中。' },
+            { id: 3, name: '女皇', enName: 'The Empress', icon: '👑', keywords: ['豐盛', '母性', '創造', '美麗'], keywordsReversed: ['依賴', '空虛', '創造力阻塞', '忽視自我'], meaning: '女皇代表著豐盛與創造力。她象徵著生命的滋養、物質的富足。', meaningReversed: '逆位的女皇可能表示過度依賴、創造力受阻。', advice: '享受生活中的美好事物，關愛身邊的人。' },
+            { id: 4, name: '皇帝', enName: 'The Emperor', icon: '🏰', keywords: ['權威', '穩定', '領導', '保護'], keywordsReversed: ['專制', '僵化', '控制慾', '不成熟'], meaning: '皇帝代表著權威和穩定的力量。他象徵著理性思維、紀律和建立秩序的能力。', meaningReversed: '逆位的皇帝可能暗示過度控制、僵化思維。', advice: '展現你的領導才能，制定明確的計劃。' },
+            { id: 5, name: '教皇', enName: 'The Hierophant', icon: '⛪', keywords: ['傳統', '指導', '信仰', '教育'], keywordsReversed: ['打破傳統', '個人信念', '反叛', '新方法'], meaning: '教皇代表著傳統價值和精神指導。他提醒我們尊重傳統智慧。', meaningReversed: '逆位的教皇可能暗示需要打破常規、建立個人信念。', advice: '向有經驗的人請教，遵循正確的方法和程序。' },
+            { id: 6, name: '戀人', enName: 'The Lovers', icon: '💕', keywords: ['愛情', '選擇', '和諧', '價值觀'], keywordsReversed: ['不和諧', '價值衝突', '錯誤選擇', '不平衡'], meaning: '戀人牌代表著愛情和重要的選擇。它象徵著內心價值觀的統一。', meaningReversed: '逆位的戀人可能暗示關係不和諧、價值觀衝突。', advice: '傾聽你的心，做出符合價值觀的選擇。' },
+            { id: 7, name: '戰車', enName: 'The Chariot', icon: '🏎️', keywords: ['勝利', '意志', '決心', '控制'], keywordsReversed: ['失控', '侵略', '缺乏方向', '挫敗'], meaning: '戰車代表著勝利和前進的動力。它象徵著克服障礙的決心。', meaningReversed: '逆位的戰車可能暗示失去控制、方向迷失。', advice: '保持專注和決心，積極採取行動。' },
+            { id: 8, name: '力量', enName: 'Strength', icon: '🦁', keywords: ['勇氣', '耐心', '內在力量', '慈悲'], keywordsReversed: ['自我懷疑', '軟弱', '缺乏自信', '濫用力量'], meaning: '力量牌代表著內在的勇氣和耐心。真正的力量來自於溫柔和自我控制。', meaningReversed: '逆位的力量暗示自我懷疑、缺乏信心。', advice: '以柔克剛，用耐心和愛心面對挑戰。' },
+            { id: 9, name: '隱士', enName: 'The Hermit', icon: '🏔️', keywords: ['內省', '智慧', '獨處', '尋找'], keywordsReversed: ['孤立', '逃避', '拒絕幫助', '迷失'], meaning: '隱士代表著內在的探索和智慧的追尋。他提醒我們有時需要獨處來找到人生的答案。', meaningReversed: '逆位的隱士可能暗示過度孤立、逃避現實。', advice: '給自己一些獨處的時間，反思和沉澱。' },
+            { id: 10, name: '命運之輪', enName: 'Wheel of Fortune', icon: '🎡', keywords: ['轉變', '機會', '命運', '週期'], keywordsReversed: ['壞運', '抗拒改變', '失控', '延遲'], meaning: '命運之輪代表著生命的循環和轉變。它提醒我們世事無常。', meaningReversed: '逆位的命運之輪可能暗示運氣不佳、抗拒必要的改變。', advice: '把握當下的機會，順應變化的潮流。' },
+            { id: 11, name: '正義', enName: 'Justice', icon: '⚖️', keywords: ['公平', '真相', '因果', '決斷'], keywordsReversed: ['不公平', '逃避責任', '偏見', '欺騙'], meaning: '正義牌代表著公平和真相。它提醒我們每個行為都有後果。', meaningReversed: '逆位的正義暗示不公平的對待、逃避責任。', advice: '誠實面對自己和他人，做出公正的決定。' },
+            { id: 12, name: '倒吊人', enName: 'The Hanged Man', icon: '🙃', keywords: ['犧牲', '等待', '新視角', '放下'], keywordsReversed: ['拖延', '抗拒', '無意義犧牲', '僵局'], meaning: '倒吊人代表著暫停和換個角度看問題。有時候放手和等待會帶來意想不到的收穫。', meaningReversed: '逆位的倒吊人可能暗示無意義的拖延、抗拒必要的改變。', advice: '嘗試用不同的角度看待問題，有時候等待也是一種智慧。' },
+            { id: 13, name: '死神', enName: 'Death', icon: '🦋', keywords: ['結束', '轉變', '重生', '放下過去'], keywordsReversed: ['抗拒改變', '停滯', '無法放手', '恐懼'], meaning: '死神牌代表著結束和轉變。它象徵著舊事物的終結，為新的開始清出空間。', meaningReversed: '逆位的死神暗示抗拒必要的改變、無法放下過去。', advice: '放下不再需要的事物，擁抱改變。每個結束都是新的開始。' },
+            { id: 14, name: '節制', enName: 'Temperance', icon: '🏺', keywords: ['平衡', '調和', '耐心', '適度'], keywordsReversed: ['失衡', '過度', '缺乏耐心', '衝突'], meaning: '節制代表著平衡和調和。它提醒我們在生活中保持中庸之道，避免極端。', meaningReversed: '逆位的節制暗示生活失衡、過度縱慾，或缺乏耐心。', advice: '保持平衡的生活方式，不要操之過急。' },
+            { id: 15, name: '惡魔', enName: 'The Devil', icon: '😈', keywords: ['束縛', '誘惑', '慾望', '陰影'], keywordsReversed: ['解脫', '覺醒', '打破束縛', '恢復力量'], meaning: '惡魔牌代表著內心的束縛和誘惑。它提醒我們正視自己的陰暗面。', meaningReversed: '逆位的惡魔暗示正在掙脫束縛、覺醒中。', advice: '檢視什麼在束縛你，是時候打破不健康的模式了。' },
+            { id: 16, name: '高塔', enName: 'The Tower', icon: '🗼', keywords: ['突變', '覺醒', '解放', '真相'], keywordsReversed: ['逃避災難', '恐懼改變', '延遲崩塌', '個人轉變'], meaning: '高塔代表著突然的變化和舊結構的崩塌。雖然令人不安，但它為重建帶來機會。', meaningReversed: '逆位的高塔可能暗示正在避免災難、恐懼必要的改變。', advice: '準備迎接變化，有些事情需要被打破才能重建得更好。' },
+            { id: 17, name: '星星', enName: 'The Star', icon: '⭐', keywords: ['希望', '靈感', '平靜', '信心'], keywordsReversed: ['絕望', '缺乏信心', '失去方向', '創意阻塞'], meaning: '星星代表著希望和靈感。它象徵著困難過後的平靜，以及對美好未來的信心。', meaningReversed: '逆位的星星暗示失去希望、缺乏信心，或感到迷失。', advice: '保持希望和信心，美好的事物正在向你靠近。' },
+            { id: 18, name: '月亮', enName: 'The Moon', icon: '🌕', keywords: ['幻覺', '潛意識', '恐懼', '直覺'], keywordsReversed: ['走出恐懼', '真相揭露', '釋放焦慮', '清晰'], meaning: '月亮代表著潛意識和直覺。它提醒我們關注夢境和內心深處的感受。', meaningReversed: '逆位的月亮暗示走出恐懼、真相逐漸清晰。', advice: '信任你的直覺，但也要分辨幻覺和現實。' },
+            { id: 19, name: '太陽', enName: 'The Sun', icon: '☀️', keywords: ['成功', '喜悅', '活力', '光明'], keywordsReversed: ['暫時挫折', '過度樂觀', '延遲的成功', '尋找快樂'], meaning: '太陽是最正面的牌之一，代表著成功、喜悅和充沛的能量。一切都會變得光明。', meaningReversed: '逆位的太陽暗示暫時的挫折、過度樂觀。', advice: '充滿自信地前進！今天是充滿能量和正向發展的一天。' },
+            { id: 20, name: '審判', enName: 'Judgement', icon: '📯', keywords: ['覺醒', '更新', '召喚', '反思'], keywordsReversed: ['自我懷疑', '拒絕反省', '錯過機會', '內疚'], meaning: '審判代表著覺醒和重生的召喚。它提醒我們反思過去，準備迎接新的人生階段。', meaningReversed: '逆位的審判暗示自我懷疑、拒絕反省過去。', advice: '傾聽內心的召喚，做出重要的人生決定。' },
+            { id: 21, name: '世界', enName: 'The World', icon: '🌍', keywords: ['完成', '圓滿', '成就', '整合'], keywordsReversed: ['未完成', '缺乏結局', '延遲', '空虛'], meaning: '世界是大阿爾克那的最後一張牌，代表著一個週期的完成和圓滿。你已經達成了目標。', meaningReversed: '逆位的世界暗示事情尚未完成、缺乏圓滿感。', advice: '慶祝你的成就！一個階段已經圓滿完成，新的旅程即將展開。' }
         ];
+        const spreads = { single: { name: '單牌占卜', cards: 1, positions: ['指引'] }, yesno: { name: '是非題占卜', cards: 1, positions: ['答案'] }, timeline: { name: '時間之流', cards: 3, positions: ['過去', '現在', '未來'] }, love: { name: '愛情牌陣', cards: 4, positions: ['你的狀態', '對方狀態', '關係現況', '建議'] }, career: { name: '事業牌陣', cards: 4, positions: ['現況', '挑戰', '建議', '結果'] }, daily: { name: '每日運勢', cards: 3, positions: ['今日主題', '注意事項', '幸運指引'] } };
+        let settings = { groqApiKey: '', aiModel: 'llama-3.3-70b-versatile', voiceService: 'web', geminiApiKey: '', gasUrl: '', enableReversed: false, enableSfx: true, enableBgm: false };
+        let currentSpread = 'single', selectedCards = [], flippedCount = 0, canFlip = false, currentResult = null, history = [];
         
-        // ============================================
-        // 牌陣定義
-        // ============================================
-        const spreads = {
-            single: {
-                name: '單牌占卜',
-                description: '快速得到指引',
-                cards: 1,
-                positions: ['指引']
-            },
-            yesno: {
-                name: '是非題占卜',
-                description: '回答是/否問題',
-                cards: 1,
-                positions: ['答案']
-            },
-            timeline: {
-                name: '時間之流',
-                description: '過去、現在、未來',
-                cards: 3,
-                positions: ['過去', '現在', '未來']
-            },
-            love: {
-                name: '愛情牌陣',
-                description: '感情關係解析',
-                cards: 4,
-                positions: ['你的狀態', '對方狀態', '關係現況', '建議']
-            },
-            career: {
-                name: '事業牌陣',
-                description: '職場工作指引',
-                cards: 4,
-                positions: ['現況', '挑戰', '建議', '結果']
-            },
-            daily: {
-                name: '每日運勢',
-                description: '今日整體運勢',
-                cards: 3,
-                positions: ['今日主題', '注意事項', '幸運指引']
-            }
-        };
+        // ===== 語音播放狀態 =====
+        let speechUtterance = null;
+        let speechState = 'stopped'; // stopped, playing, paused
         
-        // ============================================
-        // 狀態變數
-        // ============================================
-        let settings = {
-            groqApiKey: '',
-            aiModel: 'llama-3.3-70b-versatile',
-            voiceService: 'web',
-            geminiApiKey: '',
-            gasUrl: '',
-            enableReversed: false,
-            enableSfx: true,
-            enableBgm: false
-        };
-        
-        let currentSpread = 'single';
-        let selectedCards = [];
-        let flippedCount = 0;
-        let canFlip = false;
-        let currentResult = null;
-        let history = [];
-        
-        // ============================================
-        // 初始化
-        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            loadSettings();
-            loadHistory();
-            initSpreadSelector();
-            initCardGrid();
-            updateStatusTime();
-            setInterval(updateStatusTime, 1000);
-            
-            // 開機動畫
-            setTimeout(() => {
-                document.getElementById('splashScreen').classList.add('fade-out');
-                setTimeout(() => {
-                    document.getElementById('splashScreen').style.display = 'none';
-                }, 800);
-            }, 2500);
-            
-            // 初始化牌陣
+            loadSettings(); loadHistory(); initSpreadSelector(); initCardGrid(); updateStatusTime(); setInterval(updateStatusTime, 1000);
+            if ('speechSynthesis' in window) { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
+            setTimeout(() => { document.getElementById('splashScreen').classList.add('fade-out'); setTimeout(() => { document.getElementById('splashScreen').style.display = 'none'; }, 800); }, 2500);
             setupSpread(currentSpread);
         });
         
-        function updateStatusTime() {
-            const now = new Date();
-            document.getElementById('statusTime').textContent = 
-                `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-        }
+        function updateStatusTime() { const now = new Date(); document.getElementById('statusTime').textContent = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`; }
+        function loadSettings() { const saved = localStorage.getItem('tarotProSettings'); if (saved) settings = { ...settings, ...JSON.parse(saved) }; document.getElementById('groqApiKey').value = settings.groqApiKey || ''; document.getElementById('aiModel').value = settings.aiModel || 'llama-3.3-70b-versatile'; document.getElementById('voiceService').value = settings.voiceService || 'web'; document.getElementById('geminiApiKey').value = settings.geminiApiKey || ''; document.getElementById('gasUrl').value = settings.gasUrl || ''; if (settings.enableReversed) document.getElementById('toggleReversed').classList.add('active'); if (settings.enableSfx) document.getElementById('toggleSfx').classList.add('active'); if (settings.enableBgm) document.getElementById('toggleBgm').classList.add('active'); }
+        function saveSettings() { settings.groqApiKey = document.getElementById('groqApiKey').value.trim(); settings.aiModel = document.getElementById('aiModel').value; settings.voiceService = document.getElementById('voiceService').value; settings.geminiApiKey = document.getElementById('geminiApiKey').value.trim(); settings.gasUrl = document.getElementById('gasUrl').value.trim(); localStorage.setItem('tarotProSettings', JSON.stringify(settings)); }
+        function toggleReversedSetting() { settings.enableReversed = !settings.enableReversed; document.getElementById('toggleReversed').classList.toggle('active'); saveSettings(); }
+        function toggleSfxSetting() { settings.enableSfx = !settings.enableSfx; document.getElementById('toggleSfx').classList.toggle('active'); saveSettings(); }
+        function toggleBgmSetting() { settings.enableBgm = !settings.enableBgm; document.getElementById('toggleBgm').classList.toggle('active'); saveSettings(); }
+        function loadHistory() { const saved = localStorage.getItem('tarotProHistory'); if (saved) history = JSON.parse(saved); updateHistoryList(); updateStats(); }
+        function saveHistory() { localStorage.setItem('tarotProHistory', JSON.stringify(history)); updateHistoryList(); updateStats(); }
+        function addToHistory(result) { history.unshift({ id: Date.now(), date: new Date().toISOString(), spread: currentSpread, question: document.getElementById('questionInput').value || '', cards: result.cards, scores: result.scores, aiReading: result.aiReading || '' }); if (history.length > 100) history = history.slice(0, 100); saveHistory(); }
+        function updateHistoryList() { const container = document.getElementById('historyList'); if (history.length === 0) { container.innerHTML = '<div class="empty-state"><div class="icon">📜</div><p>還沒有占卜記錄</p></div>'; return; } container.innerHTML = history.slice(0, 50).map((item, index) => { const date = new Date(item.date); const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`; return `<div class="history-item" onclick="showHistoryDetail(${index})"><div class="history-item-content"><div class="history-item-header"><span class="history-item-date">${dateStr}</span><span class="history-item-spread">${spreads[item.spread]?.name || item.spread}</span></div><div class="history-item-cards">${item.cards.map(c => `<span class="history-card-mini">${c.icon}</span>`).join('')}</div>${item.question ? `<div class="history-item-question">${item.question}</div>` : ''}</div><button class="history-delete-btn" onclick="event.stopPropagation(); deleteHistoryItem(${index})">🗑️</button></div>`; }).join(''); }
+        function clearHistory() { if (confirm('確定要清除所有歷史記錄嗎？')) { history = []; saveHistory(); showToast('🗑️ 歷史記錄已清除'); } }
+        function deleteHistoryItem(index) { if (confirm('確定要刪除這筆記錄嗎？')) { history.splice(index, 1); saveHistory(); showToast('🗑️ 已刪除記錄'); } }
+        function showHistoryDetail(index) { const item = history[index]; if (!item) return; const date = new Date(item.date); const dateStr = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`; document.getElementById('historyModalTitle').textContent = spreads[item.spread]?.name || '占卜記錄'; document.getElementById('historyModalDate').textContent = `📅 ${dateStr}`; document.getElementById('historyModalCards').innerHTML = item.cards.map((card, i) => `<div style="text-align: center;"><div style="width: 60px; height: 85px; background: linear-gradient(145deg, #f5f0e1, #e8dcc8); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #2d2d2d;${card.isReversed ? ' transform: rotate(180deg);' : ''}"><span style="font-size: 28px;">${card.icon}</span><span style="font-size: 9px; font-weight: 600;">${card.name}</span></div><div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">${spreads[item.spread]?.positions[i] || ''}${card.isReversed ? ' (逆)' : ''}</div></div>`).join(''); const questionContainer = document.getElementById('historyModalQuestion'); if (item.question) { questionContainer.style.display = 'block'; document.getElementById('historyModalQuestionText').textContent = item.question; } else { questionContainer.style.display = 'none'; } if (item.scores) { document.getElementById('historyModalScores').innerHTML = `<div class="fortune-item"><div class="icon">⭐</div><div class="label">整體</div><div class="score ${item.scores.overall >= 75 ? 'high' : item.scores.overall >= 50 ? 'mid' : 'low'}">${item.scores.overall}</div></div><div class="fortune-item"><div class="icon">💕</div><div class="label">愛情</div><div class="score ${item.scores.love >= 75 ? 'high' : item.scores.love >= 50 ? 'mid' : 'low'}">${item.scores.love}</div></div><div class="fortune-item"><div class="icon">💼</div><div class="label">事業</div><div class="score ${item.scores.career >= 75 ? 'high' : item.scores.career >= 50 ? 'mid' : 'low'}">${item.scores.career}</div></div><div class="fortune-item"><div class="icon">💰</div><div class="label">財運</div><div class="score ${item.scores.wealth >= 75 ? 'high' : item.scores.wealth >= 50 ? 'mid' : 'low'}">${item.scores.wealth}</div></div>`; } const aiReadingContainer = document.getElementById('historyModalAiReading'); if (item.aiReading) { aiReadingContainer.style.display = 'block'; document.getElementById('historyModalAiText').textContent = item.aiReading; } else { aiReadingContainer.style.display = 'none'; } showModal('historyDetailModal'); }
+        function updateStats() { const total = history.length; const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); const thisWeek = history.filter(h => new Date(h.date) > weekAgo).length; let avgScore = '--'; if (history.length > 0) { const scores = history.filter(h => h.scores).map(h => h.scores.overall); if (scores.length > 0) avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length); } let streak = 0; const dates = [...new Set(history.map(h => new Date(h.date).toDateString()))]; for (let i = 0; i < dates.length; i++) { const checkDate = new Date(); checkDate.setDate(checkDate.getDate() - i); if (dates.includes(checkDate.toDateString())) streak++; else break; } document.getElementById('statTotal').textContent = total; document.getElementById('statThisWeek').textContent = thisWeek; document.getElementById('statAvgScore').textContent = avgScore; document.getElementById('statStreak').textContent = streak; const cardCounts = {}; history.forEach(h => { h.cards.forEach(c => { cardCounts[c.name] = (cardCounts[c.name] || 0) + 1; }); }); const topCards = Object.entries(cardCounts).sort((a, b) => b[1] - a[1]).slice(0, 5); const topCardsContainer = document.getElementById('topCardsList'); if (topCards.length === 0) { topCardsContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">還沒有足夠的資料</p>'; } else { topCardsContainer.innerHTML = topCards.map((item, index) => { const card = tarotDeck.find(c => c.name === item[0]); return `<div class="top-card-item"><span class="rank">#${index + 1}</span><span class="card-icon">${card?.icon || '🃏'}</span><span class="card-name">${item[0]}</span><span class="count">${item[1]}次</span></div>`; }).join(''); } }
+        function initSpreadSelector() { const selector = document.getElementById('spreadSelector'); selector.addEventListener('click', (e) => { const btn = e.target.closest('.spread-btn'); if (btn) selectSpread(btn.dataset.spread); }); }
+        function selectSpread(spread) { currentSpread = spread; document.querySelectorAll('.spread-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.spread === spread); }); setupSpread(spread); document.getElementById('resultSection').classList.remove('show'); }
+        function setupSpread(spread) { const spreadInfo = spreads[spread]; const container = document.getElementById('tarotSpread'); const isLarge = spreadInfo.cards <= 3; container.innerHTML = ''; for (let i = 0; i < spreadInfo.cards; i++) { const wrapper = document.createElement('div'); wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center;'; wrapper.innerHTML = `<div class="tarot-card ${isLarge ? 'large' : ''}" id="card${i}" onclick="flipCard(${i})"><div class="card-back">🌙</div><div class="card-front"><span class="card-image">?</span><span class="card-name">翻牌揭曉</span></div></div><div class="card-label">${spreadInfo.positions[i]}</div>`; container.appendChild(wrapper); } selectedCards = []; flippedCount = 0; canFlip = false; document.getElementById('drawBtn').disabled = false; document.getElementById('drawBtn').textContent = '🔮 開始占卜'; document.getElementById('flipHint').style.display = 'none'; }
+        function startDivine() { const btn = document.getElementById('drawBtn'); const flipMode = document.querySelector('input[name="flipMode"]:checked').value; btn.disabled = true; btn.textContent = '🔮 洗牌中...'; flippedCount = 0; canFlip = false; selectedCards = []; document.getElementById('resultSection').classList.remove('show'); stopSpeech(); document.querySelectorAll('.tarot-card').forEach(card => { card.classList.remove('flipped', 'reversed'); card.style.pointerEvents = 'none'; }); const spreadInfo = spreads[currentSpread]; const shuffled = [...tarotDeck].sort(() => Math.random() - 0.5); selectedCards = shuffled.slice(0, spreadInfo.cards).map(card => ({ ...card, isReversed: settings.enableReversed && Math.random() > 0.5 })); selectedCards.forEach((card, index) => { const cardEl = document.getElementById(`card${index}`); const front = cardEl.querySelector('.card-front'); front.querySelector('.card-image').textContent = card.icon; front.querySelector('.card-name').textContent = card.name; if (card.isReversed) { cardEl.classList.add('reversed'); front.innerHTML += '<span class="reversed-mark">逆</span>'; } }); playSfx('shuffle'); setTimeout(() => { if (flipMode === 'auto') { btn.textContent = '🔮 翻牌中...'; autoFlipCards(); } else { canFlip = true; document.querySelectorAll('.tarot-card').forEach(card => { card.style.pointerEvents = 'auto'; }); document.getElementById('flipHint').style.display = 'block'; btn.textContent = '👆 點擊卡牌翻牌'; } }, 800); }
+        function autoFlipCards() { selectedCards.forEach((card, index) => { setTimeout(() => { document.getElementById(`card${index}`).classList.add('flipped'); playSfx('flip'); flippedCount++; if (flippedCount === selectedCards.length) setTimeout(() => showResult(), 500); }, index * 500); }); }
+        function flipCard(index) { if (!canFlip) return; const cardEl = document.getElementById(`card${index}`); if (cardEl.classList.contains('flipped')) return; cardEl.classList.add('flipped'); playSfx('flip'); flippedCount++; if (flippedCount === selectedCards.length) { canFlip = false; document.getElementById('flipHint').style.display = 'none'; setTimeout(() => showResult(), 500); } }
+        function showResult() { const mainCard = selectedCards[0]; const isReversed = mainCard.isReversed; const scores = { overall: Math.floor(Math.random() * 30) + (isReversed ? 40 : 65), love: Math.floor(Math.random() * 40) + (isReversed ? 35 : 55), career: Math.floor(Math.random() * 40) + (isReversed ? 40 : 55), wealth: Math.floor(Math.random() * 40) + (isReversed ? 30 : 50) }; document.getElementById('resultHeader').innerHTML = `<div class="result-card-preview"><span>${mainCard.icon}</span><span class="name">${mainCard.name}</span></div><div class="result-info"><h3>${mainCard.name} ${isReversed ? '(逆位)' : ''}</h3><p class="position">${spreads[currentSpread].positions[0]}</p><div class="keywords">${(isReversed ? mainCard.keywordsReversed : mainCard.keywords).map(k => `<span class="keyword ${isReversed ? 'reversed' : ''}">${k}</span>`).join('')}</div></div>`; updateScore('scoreOverall', scores.overall); updateScore('scoreLove', scores.love); updateScore('scoreCareer', scores.career); updateScore('scoreWealth', scores.wealth); document.getElementById('cardMeaning').textContent = isReversed ? mainCard.meaningReversed : mainCard.meaning; document.getElementById('cardAdvice').textContent = mainCard.advice; document.getElementById('resultSection').classList.add('show'); resetSpeechUI(); document.getElementById('aiReadingContent').textContent = '正在請求 AI 解讀...'; document.getElementById('aiReadingContent').classList.add('loading'); getAIReading(); currentResult = { cards: selectedCards, scores: scores, spread: currentSpread, question: document.getElementById('questionInput').value }; addToHistory(currentResult); document.getElementById('drawBtn').disabled = false; document.getElementById('drawBtn').textContent = '🔮 重新占卜'; }
+        function updateScore(id, score) { const el = document.getElementById(id); el.textContent = score; el.className = `score ${score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'}`; }
+        async function getAIReading() { if (!settings.groqApiKey) { document.getElementById('aiReadingContent').textContent = '請在設定中輸入 Groq API Key 以啟用 AI 解讀功能。'; document.getElementById('aiReadingContent').classList.remove('loading'); return; } const question = document.getElementById('questionInput').value || '今天的運勢如何？'; const spreadInfo = spreads[currentSpread]; const cardsDescription = selectedCards.map((card, index) => `${spreadInfo.positions[index]}：${card.name}${card.isReversed ? '（逆位）' : '（正位）'}`).join('\n'); const prompt = `你是一位專業的塔羅牌解讀師。請根據以下資訊，為用戶提供深入、個人化的塔羅解讀。\n\n用戶問題：${question}\n\n牌陣：${spreadInfo.name}\n\n抽到的牌：\n${cardsDescription}\n\n請提供：\n1. 針對用戶問題的整體解讀（2-3句話）\n2. 各張牌之間的關聯分析\n3. 具體的建議和行動方向\n\n注意：\n- 使用繁體中文回答\n- 保持神秘但溫暖的語調\n- 解讀要具體、有建設性\n- 控制在 200 字以內`; try { const response = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.groqApiKey}` }, body: JSON.stringify({ model: settings.aiModel, messages: [{ role: 'system', content: '你是一位專業、溫暖的塔羅牌解讀師，擅長用繁體中文提供深入的占卜解讀。' }, { role: 'user', content: prompt }], temperature: 0.8, max_tokens: 500 }) }); const data = await response.json(); if (data.choices && data.choices[0]) { document.getElementById('aiReadingContent').textContent = data.choices[0].message.content; currentResult.aiReading = data.choices[0].message.content; if (history.length > 0) { history[0].aiReading = data.choices[0].message.content; saveHistory(); } } else throw new Error('API 回應格式錯誤'); } catch (error) { console.error('AI 解讀失敗:', error); document.getElementById('aiReadingContent').textContent = 'AI 解讀暫時無法使用，請檢查 API Key 設定。'; } document.getElementById('aiReadingContent').classList.remove('loading'); }
         
-        // ============================================
-        // 設定管理
-        // ============================================
-        function loadSettings() {
-            const saved = localStorage.getItem('tarotProSettings');
-            if (saved) {
-                settings = { ...settings, ...JSON.parse(saved) };
-            }
-            
-            // 更新 UI
-            document.getElementById('groqApiKey').value = settings.groqApiKey || '';
-            document.getElementById('aiModel').value = settings.aiModel || 'llama-3.3-70b-versatile';
-            document.getElementById('voiceService').value = settings.voiceService || 'web';
-            document.getElementById('geminiApiKey').value = settings.geminiApiKey || '';
-            document.getElementById('gasUrl').value = settings.gasUrl || '';
-            
-            if (settings.enableReversed) {
-                document.getElementById('toggleReversed').classList.add('active');
-            }
-            if (settings.enableSfx) {
-                document.getElementById('toggleSfx').classList.add('active');
-            }
-            if (settings.enableBgm) {
-                document.getElementById('toggleBgm').classList.add('active');
-            }
-        }
+        // ==================== 語音播報系統（完整控制）====================
+        function getChineseVoice() { const voices = speechSynthesis.getVoices(); return voices.find(v => v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh-CN')) || voices.find(v => v.lang.includes('zh')); }
+        function generateSpeechText() { if (!currentResult) return ''; const mainCard = currentResult.cards[0]; const scores = currentResult.scores; const aiReading = currentResult.aiReading || ''; let text = `你抽到的牌是${mainCard.name}${mainCard.isReversed ? '逆位' : ''}。`; text += `整體運勢${scores.overall}分，愛情運${scores.love}分，事業運${scores.career}分，財運${scores.wealth}分。`; text += `牌義解讀：${mainCard.isReversed ? mainCard.meaningReversed : mainCard.meaning}。`; text += `建議：${mainCard.advice}。`; if (aiReading) text += `AI 智慧解讀：${aiReading}`; return text; }
+        function resetSpeechUI() { speechState = 'stopped'; const mainBtn = document.getElementById('voiceMainBtn'); const controls = document.getElementById('voiceControls'); const status = document.getElementById('voiceStatus'); const pauseBtn = document.getElementById('voicePauseBtn'); if (mainBtn) { mainBtn.innerHTML = '🔊 語音播報'; mainBtn.classList.remove('playing', 'paused'); } if (controls) controls.style.display = 'none'; if (status) status.textContent = ''; if (pauseBtn) pauseBtn.innerHTML = '⏸️ 暫停'; }
+        function updateSpeechUI() { const mainBtn = document.getElementById('voiceMainBtn'); const controls = document.getElementById('voiceControls'); const status = document.getElementById('voiceStatus'); const pauseBtn = document.getElementById('voicePauseBtn'); if (!mainBtn) return; mainBtn.classList.remove('playing', 'paused'); switch (speechState) { case 'playing': mainBtn.innerHTML = '🔊 播放中...'; mainBtn.classList.add('playing'); if (controls) controls.style.display = 'flex'; if (pauseBtn) { pauseBtn.innerHTML = '⏸️ 暫停'; pauseBtn.disabled = false; } if (status) status.textContent = '🔊 正在播放語音...'; break; case 'paused': mainBtn.innerHTML = '▶️ 繼續播放'; mainBtn.classList.add('paused'); if (controls) controls.style.display = 'flex'; if (pauseBtn) { pauseBtn.innerHTML = '▶️ 繼續'; pauseBtn.disabled = false; } if (status) status.textContent = '⏸️ 語音已暫停'; break; case 'stopped': default: mainBtn.innerHTML = '🔊 語音播報'; if (controls) controls.style.display = 'none'; if (status) status.textContent = ''; break; } }
+        function toggleSpeech() { if (!currentResult) { showToast('⚠️ 請先進行占卜'); return; } if (!('speechSynthesis' in window)) { showToast('⚠️ 您的瀏覽器不支援語音功能'); return; } switch (speechState) { case 'stopped': startSpeech(); break; case 'playing': pauseSpeech(); break; case 'paused': resumeSpeech(); break; } }
+        function startSpeech() { speechSynthesis.cancel(); const text = generateSpeechText(); speechUtterance = new SpeechSynthesisUtterance(text); const voice = getChineseVoice(); if (voice) speechUtterance.voice = voice; speechUtterance.lang = 'zh-TW'; speechUtterance.rate = 0.9; speechUtterance.pitch = 1; speechUtterance.onstart = () => { speechState = 'playing'; updateSpeechUI(); }; speechUtterance.onend = () => { speechState = 'stopped'; updateSpeechUI(); showToast('✅ 語音播報完成'); }; speechUtterance.onerror = (e) => { console.error('語音錯誤:', e); speechState = 'stopped'; updateSpeechUI(); if (e.error !== 'canceled') showToast('❌ 語音播放失敗'); }; speechSynthesis.speak(speechUtterance); showToast('🔊 開始語音播報'); }
+        function pauseSpeech() { if (speechState === 'playing') { speechSynthesis.pause(); speechState = 'paused'; updateSpeechUI(); showToast('⏸️ 語音已暫停'); } else if (speechState === 'paused') { resumeSpeech(); } }
+        function resumeSpeech() { if (speechState === 'paused') { speechSynthesis.resume(); speechState = 'playing'; updateSpeechUI(); showToast('▶️ 繼續播放'); } }
+        function stopSpeech() { speechSynthesis.cancel(); speechState = 'stopped'; updateSpeechUI(); }
+        function replaySpeech() { stopSpeech(); setTimeout(() => startSpeech(), 100); }
+        // ==================== 語音播報系統結束 ====================
         
-        function saveSettings() {
-            settings.groqApiKey = document.getElementById('groqApiKey').value.trim();
-            settings.aiModel = document.getElementById('aiModel').value;
-            settings.voiceService = document.getElementById('voiceService').value;
-            settings.geminiApiKey = document.getElementById('geminiApiKey').value.trim();
-            settings.gasUrl = document.getElementById('gasUrl').value.trim();
-            
-            localStorage.setItem('tarotProSettings', JSON.stringify(settings));
-        }
-        
-        function toggleReversedSetting() {
-            settings.enableReversed = !settings.enableReversed;
-            document.getElementById('toggleReversed').classList.toggle('active');
-            saveSettings();
-        }
-        
-        function toggleSfxSetting() {
-            settings.enableSfx = !settings.enableSfx;
-            document.getElementById('toggleSfx').classList.toggle('active');
-            saveSettings();
-        }
-        
-        function toggleBgmSetting() {
-            settings.enableBgm = !settings.enableBgm;
-            document.getElementById('toggleBgm').classList.toggle('active');
-            saveSettings();
-        }
-        
-        // ============================================
-        // 歷史記錄
-        // ============================================
-        function loadHistory() {
-            const saved = localStorage.getItem('tarotProHistory');
-            if (saved) {
-                history = JSON.parse(saved);
-            }
-            updateHistoryList();
-            updateStats();
-        }
-        
-        function saveHistory() {
-            localStorage.setItem('tarotProHistory', JSON.stringify(history));
-            updateHistoryList();
-            updateStats();
-        }
-        
-        function addToHistory(result) {
-            history.unshift({
-                id: Date.now(),
-                date: new Date().toISOString(),
-                spread: currentSpread,
-                question: document.getElementById('questionInput').value || '',
-                cards: result.cards,
-                scores: result.scores
-            });
-            
-            // 最多保留 100 筆
-            if (history.length > 100) {
-                history = history.slice(0, 100);
-            }
-            
-            saveHistory();
-        }
-        
-        function updateHistoryList() {
-            const container = document.getElementById('historyList');
-            
-            if (history.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">📜</div>
-                        <p>還沒有占卜記錄</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = history.slice(0, 20).map(item => {
-                const date = new Date(item.date);
-                const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-                const spreadName = spreads[item.spread]?.name || item.spread;
-                
-                return `
-                    <div class="history-item" onclick="viewHistoryDetail(${item.id})">
-                        <div class="history-item-header">
-                            <span class="history-item-date">${dateStr}</span>
-                            <span class="history-item-spread">${spreadName}</span>
-                        </div>
-                        <div class="history-item-cards">
-                            ${item.cards.map(c => `<span class="history-card-mini">${c.icon}</span>`).join('')}
-                        </div>
-                        ${item.question ? `<div class="history-item-question">${item.question}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function viewHistoryDetail(id) {
-            const item = history.find(h => h.id === id);
-            if (item) {
-                showToast('📜 查看歷史記錄');
-                // TODO: 顯示詳細模態框
-            }
-        }
-        
-        function clearHistory() {
-            if (confirm('確定要清除所有歷史記錄嗎？')) {
-                history = [];
-                saveHistory();
-                showToast('🗑️ 歷史記錄已清除');
-            }
-        }
-        
-        // ============================================
-        // 統計
-        // ============================================
-        function updateStats() {
-            const total = history.length;
-            
-            // 本週
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const thisWeek = history.filter(h => new Date(h.date) > weekAgo).length;
-            
-            // 平均分數
-            let avgScore = '--';
-            if (history.length > 0) {
-                const scores = history.filter(h => h.scores).map(h => h.scores.overall);
-                if (scores.length > 0) {
-                    avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-                }
-            }
-            
-            // 連續天數
-            let streak = 0;
-            const today = new Date().toDateString();
-            const dates = [...new Set(history.map(h => new Date(h.date).toDateString()))];
-            for (let i = 0; i < dates.length; i++) {
-                const checkDate = new Date();
-                checkDate.setDate(checkDate.getDate() - i);
-                if (dates.includes(checkDate.toDateString())) {
-                    streak++;
-                } else {
-                    break;
-                }
-            }
-            
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statThisWeek').textContent = thisWeek;
-            document.getElementById('statAvgScore').textContent = avgScore;
-            document.getElementById('statStreak').textContent = streak;
-            
-            // 最常抽到的牌
-            const cardCounts = {};
-            history.forEach(h => {
-                h.cards.forEach(c => {
-                    cardCounts[c.name] = (cardCounts[c.name] || 0) + 1;
-                });
-            });
-            
-            const topCards = Object.entries(cardCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            
-            const topCardsContainer = document.getElementById('topCardsList');
-            if (topCards.length === 0) {
-                topCardsContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">還沒有足夠的資料</p>';
-            } else {
-                topCardsContainer.innerHTML = topCards.map((item, index) => {
-                    const card = tarotDeck.find(c => c.name === item[0]);
-                    return `
-                        <div class="top-card-item">
-                            <span class="rank">#${index + 1}</span>
-                            <span class="card-icon">${card?.icon || '🃏'}</span>
-                            <span class="card-name">${item[0]}</span>
-                            <span class="count">${item[1]}次</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-        
-        // ============================================
-        // 牌陣選擇
-        // ============================================
-        function initSpreadSelector() {
-            const selector = document.getElementById('spreadSelector');
-            selector.addEventListener('click', (e) => {
-                const btn = e.target.closest('.spread-btn');
-                if (btn) {
-                    const spread = btn.dataset.spread;
-                    selectSpread(spread);
-                }
-            });
-        }
-        
-        function selectSpread(spread) {
-            currentSpread = spread;
-            
-            // 更新按鈕狀態
-            document.querySelectorAll('.spread-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.spread === spread);
-            });
-            
-            // 設置牌陣
-            setupSpread(spread);
-            
-            // 隱藏結果
-            document.getElementById('resultSection').classList.remove('show');
-        }
-        
-        function setupSpread(spread) {
-            const spreadInfo = spreads[spread];
-            const container = document.getElementById('tarotSpread');
-            
-            const cardCount = spreadInfo.cards;
-            const isLarge = cardCount <= 3;
-            
-            container.innerHTML = '';
-            
-            for (let i = 0; i < cardCount; i++) {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `tarot-card ${isLarge ? 'large' : ''}`;
-                cardDiv.id = `card${i}`;
-                cardDiv.onclick = () => flipCard(i);
-                cardDiv.innerHTML = `
-                    <div class="card-back">🌙</div>
-                    <div class="card-front">
-                        <span class="card-image">?</span>
-                        <span class="card-name">翻牌揭曉</span>
-                    </div>
-                `;
-                
-                const wrapper = document.createElement('div');
-                wrapper.style.display = 'flex';
-                wrapper.style.flexDirection = 'column';
-                wrapper.style.alignItems = 'center';
-                wrapper.appendChild(cardDiv);
-                
-                const label = document.createElement('div');
-                label.className = 'card-label';
-                label.textContent = spreadInfo.positions[i];
-                wrapper.appendChild(label);
-                
-                container.appendChild(wrapper);
-            }
-            
-            // 重置狀態
-            selectedCards = [];
-            flippedCount = 0;
-            canFlip = false;
-            
-            document.getElementById('drawBtn').disabled = false;
-            document.getElementById('drawBtn').textContent = '🔮 開始占卜';
-            document.getElementById('flipHint').style.display = 'none';
-        }
-        
-        // ============================================
-        // 占卜流程
-        // ============================================
-        function startDivine() {
-            const btn = document.getElementById('drawBtn');
-            const flipMode = document.querySelector('input[name="flipMode"]:checked').value;
-            
-            btn.disabled = true;
-            btn.textContent = '🔮 洗牌中...';
-            
-            // 重置
-            flippedCount = 0;
-            canFlip = false;
-            selectedCards = [];
-            document.getElementById('resultSection').classList.remove('show');
-            
-            // 重置卡片
-            document.querySelectorAll('.tarot-card').forEach(card => {
-                card.classList.remove('flipped', 'reversed');
-                card.style.pointerEvents = 'none';
-            });
-            
-            // 洗牌選牌
-            const spreadInfo = spreads[currentSpread];
-            const shuffled = [...tarotDeck].sort(() => Math.random() - 0.5);
-            selectedCards = shuffled.slice(0, spreadInfo.cards).map(card => {
-                const isReversed = settings.enableReversed && Math.random() > 0.5;
-                return { ...card, isReversed };
-            });
-            
-            // 設置牌面
-            selectedCards.forEach((card, index) => {
-                const cardEl = document.getElementById(`card${index}`);
-                const front = cardEl.querySelector('.card-front');
-                front.querySelector('.card-image').textContent = card.icon;
-                front.querySelector('.card-name').textContent = card.name;
-                
-                if (card.isReversed) {
-                    cardEl.classList.add('reversed');
-                    front.innerHTML += '<span class="reversed-mark">逆</span>';
-                }
-            });
-            
-            // 播放音效
-            playSfx('shuffle');
-            
-            setTimeout(() => {
-                if (flipMode === 'auto') {
-                    btn.textContent = '🔮 翻牌中...';
-                    autoFlipCards();
-                } else {
-                    canFlip = true;
-                    document.querySelectorAll('.tarot-card').forEach(card => {
-                        card.style.pointerEvents = 'auto';
-                    });
-                    document.getElementById('flipHint').style.display = 'block';
-                    btn.textContent = '👆 點擊卡牌翻牌';
-                }
-            }, 800);
-        }
-        
-        function autoFlipCards() {
-            selectedCards.forEach((card, index) => {
-                setTimeout(() => {
-                    const cardEl = document.getElementById(`card${index}`);
-                    cardEl.classList.add('flipped');
-                    playSfx('flip');
-                    flippedCount++;
-                    
-                    if (flippedCount === selectedCards.length) {
-                        setTimeout(() => showResult(), 500);
-                    }
-                }, index * 500);
-            });
-        }
-        
-        function flipCard(index) {
-            if (!canFlip) return;
-            
-            const cardEl = document.getElementById(`card${index}`);
-            if (cardEl.classList.contains('flipped')) return;
-            
-            cardEl.classList.add('flipped');
-            playSfx('flip');
-            flippedCount++;
-            
-            if (flippedCount === selectedCards.length) {
-                canFlip = false;
-                document.getElementById('flipHint').style.display = 'none';
-                setTimeout(() => showResult(), 500);
-            }
-        }
-        
-        // ============================================
-        // 顯示結果
-        // ============================================
-        function showResult() {
-            const mainCard = selectedCards[0];
-            const isReversed = mainCard.isReversed;
-            
-            // 計算分數
-            const scores = {
-                overall: Math.floor(Math.random() * 30) + (isReversed ? 40 : 65),
-                love: Math.floor(Math.random() * 40) + (isReversed ? 35 : 55),
-                career: Math.floor(Math.random() * 40) + (isReversed ? 40 : 55),
-                wealth: Math.floor(Math.random() * 40) + (isReversed ? 30 : 50)
-            };
-            
-            // 更新結果 UI
-            document.getElementById('resultHeader').innerHTML = `
-                <div class="result-card-preview">
-                    <span>${mainCard.icon}</span>
-                    <span class="name">${mainCard.name}</span>
-                </div>
-                <div class="result-info">
-                    <h3>${mainCard.name} ${isReversed ? '(逆位)' : ''}</h3>
-                    <p class="position">${spreads[currentSpread].positions[0]}</p>
-                    <div class="keywords">
-                        ${(isReversed ? mainCard.keywordsReversed : mainCard.keywords).map(k => 
-                            `<span class="keyword ${isReversed ? 'reversed' : ''}">${k}</span>`
-                        ).join('')}
-                    </div>
-                </div>
-            `;
-            
-            // 更新分數
-            updateScore('scoreOverall', scores.overall);
-            updateScore('scoreLove', scores.love);
-            updateScore('scoreCareer', scores.career);
-            updateScore('scoreWealth', scores.wealth);
-            
-            // 更新牌義
-            document.getElementById('cardMeaning').textContent = 
-                isReversed ? mainCard.meaningReversed : mainCard.meaning;
-            document.getElementById('cardAdvice').textContent = mainCard.advice;
-            
-            // 顯示結果區
-            document.getElementById('resultSection').classList.add('show');
-            
-            // AI 解讀
-            document.getElementById('aiReadingContent').textContent = '正在請求 AI 解讀...';
-            document.getElementById('aiReadingContent').classList.add('loading');
-            getAIReading();
-            
-            // 儲存結果
-            currentResult = {
-                cards: selectedCards,
-                scores: scores,
-                spread: currentSpread,
-                question: document.getElementById('questionInput').value
-            };
-            
-            // 加入歷史
-            addToHistory(currentResult);
-            
-            // 更新按鈕
-            document.getElementById('drawBtn').disabled = false;
-            document.getElementById('drawBtn').textContent = '🔮 重新占卜';
-        }
-        
-        function updateScore(id, score) {
-            const el = document.getElementById(id);
-            el.textContent = score;
-            el.className = `score ${score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'}`;
-        }
-        
-        // ============================================
-        // AI 解讀
-        // ============================================
-        async function getAIReading() {
-            if (!settings.groqApiKey) {
-                document.getElementById('aiReadingContent').textContent = 
-                    '請在設定中輸入 Groq API Key 以啟用 AI 解讀功能。';
-                document.getElementById('aiReadingContent').classList.remove('loading');
-                return;
-            }
-            
-            const question = document.getElementById('questionInput').value || '今天的運勢如何？';
-            const spreadInfo = spreads[currentSpread];
-            
-            const cardsDescription = selectedCards.map((card, index) => {
-                const position = spreadInfo.positions[index];
-                const reversed = card.isReversed ? '（逆位）' : '（正位）';
-                return `${position}：${card.name}${reversed}`;
-            }).join('\n');
-            
-            const prompt = `你是一位專業的塔羅牌解讀師。請根據以下資訊，為用戶提供深入、個人化的塔羅解讀。
-
-用戶問題：${question}
-
-牌陣：${spreadInfo.name}
-
-抽到的牌：
-${cardsDescription}
-
-請提供：
-1. 針對用戶問題的整體解讀（2-3句話）
-2. 各張牌之間的關聯分析
-3. 具體的建議和行動方向
-
-注意：
-- 使用繁體中文回答
-- 保持神秘但溫暖的語調
-- 解讀要具體、有建設性
-- 控制在 200 字以內`;
-
-            try {
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${settings.groqApiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: settings.aiModel,
-                        messages: [
-                            { role: 'system', content: '你是一位專業、溫暖的塔羅牌解讀師，擅長用繁體中文提供深入的占卜解讀。' },
-                            { role: 'user', content: prompt }
-                        ],
-                        temperature: 0.8,
-                        max_tokens: 500
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.choices && data.choices[0]) {
-                    document.getElementById('aiReadingContent').textContent = data.choices[0].message.content;
-                    currentResult.aiReading = data.choices[0].message.content;
-                } else {
-                    throw new Error('API 回應格式錯誤');
-                }
-            } catch (error) {
-                console.error('AI 解讀失敗:', error);
-                document.getElementById('aiReadingContent').textContent = 
-                    'AI 解讀暫時無法使用，請檢查 API Key 設定。';
-            }
-            
-            document.getElementById('aiReadingContent').classList.remove('loading');
-        }
-        
-        // ============================================
-        // 語音播報
-        // ============================================
-        function speakResult() {
-            if (!currentResult) return;
-            
-            const mainCard = currentResult.cards[0];
-            const text = `你抽到的牌是${mainCard.name}${mainCard.isReversed ? '逆位' : ''}。
-                ${mainCard.isReversed ? mainCard.meaningReversed : mainCard.meaning}
-                建議：${mainCard.advice}`;
-            
-            if (settings.voiceService === 'web') {
-                speakWithWebAPI(text);
-            } else if (settings.voiceService === 'gemini' && settings.geminiApiKey) {
-                speakWithGemini(text);
-            } else {
-                speakWithWebAPI(text);
-            }
-            
-            showToast('🔊 開始語音播報');
-        }
-        
-        function speakWithWebAPI(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'zh-TW';
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
-            }
-        }
-        
-        async function speakWithGemini(text) {
-            // Gemini TTS 實現（簡化版）
-            speakWithWebAPI(text);
-        }
-        
-        // ============================================
-        // LINE 發送
-        // ============================================
-        async function sendToLine() {
-            if (!settings.gasUrl) {
-                showToast('⚠️ 請先設定 GAS URL');
-                showPage('settings');
-                return;
-            }
-            
-            if (!currentResult) {
-                showToast('⚠️ 請先進行占卜');
-                return;
-            }
-            
-            try {
-                await fetch(settings.gasUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'sendTarot',
-                        result: {
-                            card: currentResult.cards[0],
-                            scores: currentResult.scores,
-                            date: new Date().toLocaleDateString('zh-TW'),
-                            aiReading: currentResult.aiReading
-                        }
-                    })
-                });
-                
-                showToast('✅ 已發送到 LINE！');
-            } catch (error) {
-                showToast('❌ 發送失敗');
-                console.error(error);
-            }
-        }
-        
-        // ============================================
-        // 學習頁
-        // ============================================
-        function initCardGrid() {
-            const container = document.getElementById('cardGrid');
-            container.innerHTML = tarotDeck.map(card => `
-                <div class="card-learn-item" onclick="showCardDetail(${card.id})">
-                    <div class="icon">${card.icon}</div>
-                    <div class="name">${card.name}</div>
-                </div>
-            `).join('');
-        }
-        
-        function showCardDetail(id) {
-            const card = tarotDeck.find(c => c.id === id);
-            if (!card) return;
-            
-            document.getElementById('modalCardName').textContent = card.name;
-            document.getElementById('modalCardIcon').textContent = card.icon;
-            document.getElementById('modalCardEnName').textContent = card.enName;
-            document.getElementById('modalKeywords').innerHTML = 
-                card.keywords.map(k => `<span class="keyword">${k}</span>`).join('');
-            document.getElementById('modalMeaningUpright').textContent = card.meaning;
-            document.getElementById('modalMeaningReversed').textContent = card.meaningReversed;
-            document.getElementById('modalAdvice').textContent = card.advice;
-            
-            showModal('cardDetailModal');
-        }
-        
-        // ============================================
-        // 頁面導航
-        // ============================================
-        function showPage(page) {
-            // 儲存設定
-            if (page !== 'settings') {
-                saveSettings();
-            }
-            
-            // 更新頁面
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(`page-${page}`).classList.add('active');
-            
-            // 更新導航
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const navItem = document.querySelector(`.nav-item[onclick="showPage('${page}')"]`);
-            if (navItem) navItem.classList.add('active');
-            
-            // 捲動到頂部
-            window.scrollTo(0, 0);
-        }
-        
-        // ============================================
-        // 模態框
-        // ============================================
-        function showModal(id) {
-            document.getElementById(id).classList.add('show');
-        }
-        
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-        
-        // ============================================
-        // 工具函數
-        // ============================================
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        
-        function playSfx(type) {
-            if (!settings.enableSfx) return;
-            
-            // 使用 Web Audio API 產生簡單音效
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                if (type === 'shuffle') {
-                    oscillator.frequency.value = 300;
-                    gainNode.gain.value = 0.1;
-                } else if (type === 'flip') {
-                    oscillator.frequency.value = 500;
-                    gainNode.gain.value = 0.1;
-                }
-                
-                oscillator.start();
-                setTimeout(() => oscillator.stop(), 100);
-            } catch (e) {
-                console.log('音效播放失敗:', e);
-            }
-        }
-        
-        function toggleSound() {
-            settings.enableSfx = !settings.enableSfx;
-            saveSettings();
-            showToast(settings.enableSfx ? '🔊 音效已開啟' : '🔇 音效已關閉');
-        }
-        
-        function exportData() {
-            const data = {
-                settings: settings,
-                history: history,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `tarot-backup-${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showToast('📤 資料已匯出');
-        }
+        async function sendToLine() { if (!settings.gasUrl) { showToast('⚠️ 請先設定 GAS URL'); showPage('settings'); return; } if (!currentResult) { showToast('⚠️ 請先進行占卜'); return; } try { await fetch(settings.gasUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'sendTarot', result: { card: currentResult.cards[0], scores: currentResult.scores, date: new Date().toLocaleDateString('zh-TW'), aiReading: currentResult.aiReading } }) }); showToast('✅ 已發送到 LINE！'); } catch (error) { showToast('❌ 發送失敗'); console.error(error); } }
+        function initCardGrid() { const container = document.getElementById('cardGrid'); container.innerHTML = tarotDeck.map(card => `<div class="card-learn-item" onclick="showCardDetail(${card.id})"><div class="icon">${card.icon}</div><div class="name">${card.name}</div></div>`).join(''); }
+        function showCardDetail(id) { const card = tarotDeck.find(c => c.id === id); if (!card) return; document.getElementById('modalCardName').textContent = card.name; document.getElementById('modalCardIcon').textContent = card.icon; document.getElementById('modalCardEnName').textContent = card.enName; document.getElementById('modalKeywords').innerHTML = card.keywords.map(k => `<span class="keyword">${k}</span>`).join(''); document.getElementById('modalMeaningUpright').textContent = card.meaning; document.getElementById('modalMeaningReversed').textContent = card.meaningReversed; document.getElementById('modalAdvice').textContent = card.advice; showModal('cardDetailModal'); }
+        function showPage(page) { if (page !== 'settings') saveSettings(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(`page-${page}`).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); const navItem = document.querySelector(`.nav-item[onclick="showPage('${page}')"]`); if (navItem) navItem.classList.add('active'); window.scrollTo(0, 0); }
+        function showModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        function showToast(message) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+        function playSfx(type) { if (!settings.enableSfx) return; try { const audioContext = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioContext.createOscillator(); const gainNode = audioContext.createGain(); oscillator.connect(gainNode); gainNode.connect(audioContext.destination); if (type === 'shuffle') { oscillator.frequency.value = 300; gainNode.gain.value = 0.1; } else if (type === 'flip') { oscillator.frequency.value = 500; gainNode.gain.value = 0.1; } oscillator.start(); setTimeout(() => oscillator.stop(), 100); } catch (e) { console.log('音效播放失敗:', e); } }
+        function toggleSound() { settings.enableSfx = !settings.enableSfx; saveSettings(); showToast(settings.enableSfx ? '🔊 音效已開啟' : '🔇 音效已關閉'); }
+        function exportData() { const data = { settings: settings, history: history, exportDate: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `tarot-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); showToast('📤 資料已匯出'); }
     </script>
 </body>
 </html>
